@@ -1,0 +1,8 @@
+{
+    "hi": "Hi",
+    "check_auth": "Await authorization",
+    "reg": "Registration",
+    "reg_ok": "Registration complete",
+    "user_recog": "User recognized",
+    "admin_recog": "Admin recognized"
+}
