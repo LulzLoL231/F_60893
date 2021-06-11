@@ -12,23 +12,17 @@ from asyncpg.connection import Connection
 from config import config
 
 
-class connect(object):
-    '''DB connect resolver.
-    '''
-    def __init__(self, dsn: str):
-        self.dsn = dsn
-
-    def __call__(self, func: Coroutine):
-        async def wrapped():
-            conn = await asyncpg.connect(self.dsn)
-            result = await func(conn)
-            await conn.close()
-            return result
-        return wrapped
+DSN = f'postgresql://{config.DB_USERNAME}:{config.DB_PASSWORD}@{config.DB_HOST}:{str(config.DB_PORT)}/'
+DSN += f'{config.DB_BASE_NAME}?sslmode={config.DB_SSL}'
 
 
-DSN = f'postgresql://{config.DB_USERNAME}:{config.DB_PASSWORD}@{config.DB_HOST}:{str(config.DB_PORT)}'
-DSN += f'{config.DB_BASE_NAME}?sslmode={config.DB_SSL}&sslrootcert={config.DB_SSL_ROOTCERT}'
+def DBConnect(func):
+    async def wrap(self, *args, **kwargs):
+        conn = await asyncpg.connect(DSN)
+        res = await func(self, *args, **kwargs, conn=conn)
+        await conn.close()
+        return res
+    return wrap
 
 
 class Database:
@@ -36,22 +30,40 @@ class Database:
     '''
     def __init__(self) -> None:
         self.log = logging.getLogger('F_60893')
+        self.log.debug(f'"database.Database.__init__": DSN: "{DSN}"')
 
-    @connect(DSN)
-    async def _check_users_table(self, conn: Connection) -> bool:
-        '''Private func: Check if "bot_users" table exists.
+    @DBConnect
+    async def _check_table_exists(self, table: str, conn: Connection) -> bool:
+        '''Private func: Check table exists.
 
         Args:
             conn (Connection): DB Connection.
+            table (str): Table to search.
 
         Returns:
             bool: True if table exists, otherwise False.
         '''
-        res = await conn.fetchrow('''SELECT EXISTS (
-        SELECT FROM pg_tables
-        WHERE  schemaname = "public"
-        AND    tablename  = "bot_users");''')
-        return res.exists
+        res = await conn.fetchrow("SELECT to_regclass($1);", table)
+        return bool(res['to_regclass'])
+
+
+    @DBConnect
+    async def _create_bot_users_table(self, conn: Connection) -> None:
+        '''Private func: Creates bot_users table.
+
+        Args:
+            conn (Connection): DB connection.
+        '''
+        sql = '''CREATE TABLE IF NOT EXISTS bot_users (
+            uid             integer NOT NULL PRIMARY KEY,
+            apis            tid,
+            admin           bool DEFAULT false,
+            premium         bool DEFAULT false,
+            premium_start   timestamp,
+            premium_end     timestamp
+        );
+        '''
+        res = await conn.execute(sql)
 
 
     async def check_database(self) -> bool:
@@ -61,15 +73,22 @@ class Database:
             bool: Если ошибок нет - True. Иначе False.
         '''
         self.log.info('"database.Database.check_database": Checking DB...')
-        users = await self._check_users_table()
-        if users:
-            self.log.info('"database.Database.check_database": Check complete!')
-            return True
+        stat = await self.check_connection()
+        if stat:
+            users = await self._check_table_exists('bot_users')
+            if users:
+                self.log.info('"database.Database.check_database": Check complete!')
+                return True
+            else:
+                self.log.warning('"database.Database.check_database": Table "bot_users" is not found! Creating...')
+                stat = await self._create_bot_users_table()
+                if stat:
+                    self.log.info('"database.Database.cehck_database": Table "bot_users" successfull created!')
         else:
-            self.log.error('"database.Database.check_database": Table "bot_users" is not found!')
+            self.log.error('"database.Database.check_database": Error while checking connection!')
             return False
 
-    @connect(DSN)
+    @DBConnect
     async def get_user(self, conn: Connection, uid: int) -> Optional[Union[dict, None]]:
         '''Возвращает пользователя по Telegram userID.
 
@@ -80,7 +99,43 @@ class Database:
         Returns:
             Optional[Union[dict, None]]: User dict or None.
         '''
-        res = await conn.fetchrow('SELECT * FROM "bot_users" WHERE uid = $1', uid)
+        res = await conn.fetchrow('SELECT * FROM bot_users WHERE uid = $1', uid)
         if res:
             return dict(res)
         return None
+
+    @DBConnect
+    async def add_user(self, uid: int, conn: Connection) -> bool:
+        '''Регистрация нового пользователя.
+
+        Args:
+            uid (int): Telegram userID.
+            conn (Connection): DB connection.
+
+        Returns:
+            bool: Boolean.
+        '''
+        sql = 'INSERT INTO bot_users (uid, language) VALUES ($1, $2)'
+        stat = await conn.execute(sql, uid, 'ru')
+        if stat:
+            return True
+        return False
+
+    @DBConnect
+    async def check_connection(self, conn: Connection) -> bool:
+        '''Проверяет подключение к БД.
+
+        Args:
+            conn (Connection): DB connection.
+
+        Returns:
+            bool: Boolean.
+        '''
+        res = await conn.fetchrow('SELECT version();')
+        if res:
+            self.log.info('"database.Database.check_connection": Connection Established!')
+            self.log.debug(f'"database.Database.check_connection": {res["version"]}')
+            return True
+        else:
+            self.log.error('"database.Database.check_connection": Unknown error when trying connect to DB!')
+            return False

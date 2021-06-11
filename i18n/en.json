@@ -3,6 +3,7 @@
     "check_auth": "Await authorization",
     "reg": "Registration",
     "reg_ok": "Registration complete",
+    "reg_err": "Unsuccessfull registration",
     "user_recog": "User recognized",
     "admin_recog": "Admin recognized"
 }

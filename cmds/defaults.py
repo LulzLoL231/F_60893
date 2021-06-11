@@ -8,7 +8,7 @@ from logging import getLogger
 from aiogram import types
 
 from emojis import Emojis
-from runtime import bot, langs, db
+from runtime import bot, langs, tempDB, db
 from config import config, USR_TEMP
 
 
@@ -26,16 +26,20 @@ async def start(msg: types.Message):
     lang = langs.get_language()
     ev = await msg.answer(f'<code>{lang.get("check_auth")}...</code>')
     log.debug('"cmds.defaults.start": Checking DB...')
-    if msg.chat.id not in db['users']:
+    usr = await db.get_user(uid=msg.chat.id)
+    if usr is None:
+        log.debug(f'"cmds.defaults.start": User #{str(msg.chat.id)} not found in DB. Registration...')
         await ev.edit_text(f'<code>{lang.get("reg")}...</code>')
-        usr = USR_TEMP.copy()
-        usr['uid'] = msg.chat.id
-        usr['lang'] = config.DEFAULT_LANG
-        db['users'].update({msg.chat.id: usr})
-        log.debug(f'"cmds.defaults.start": User #{str(msg.chat.id)} added to DB.')
-        msg_cnt = f'<code>{lang.get("reg_ok")}!</code>\n'
+        stat = await db.add_user(uid=msg.chat.id)
+        if stat:
+            log.debug(f'"cmds.defaults.start": User #{str(msg.chat.id)} added to DB.')
+            msg_cnt = f'<code>{lang.get("reg_ok")}!</code>\n'
+        else:
+            log.error(f'"cmds.defaults.start" User #{str(msg.chat.id)} registration failed!')
+            await ev.edit_text(f'{Emojis.error} <code>{lang.get("reg_err")}!</code>')
     else:
         log.debug(f'"cmds.deafults.start": User #{str(msg.chat.id)} found in DB.')
+        lang = langs.get_language(usr['language'])
         msg_cnt = f'<code>{lang.get("user_recog")}!</code>\n'
     msg_cnt += f'{lang.get("hi")}, {msg.chat.first_name}! {Emojis.hi}'
     await ev.edit_text(msg_cnt)

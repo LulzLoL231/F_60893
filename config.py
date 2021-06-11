@@ -9,7 +9,7 @@ from datetime import datetime
 
 
 BOT_NAME = 'F_60893'
-VERSION = '0.1.0'
+VERSION = '0.2.0'
 USR_TEMP = {
     'uid': 0,
     'registered': False,
@@ -34,7 +34,7 @@ class Configuration:
         DB_PORT (int) - Порт БД. Стандарт: 5432.
         DB_USERNAME (str) - Пользователь БД. Стандарт: "UNKNOWN".
         DB_PASSWORD (str) - Пароль пользователя БД. Стандарт: "UNKNOWN".
-        DB_BASE_NAME (str) - Имя базы в БД. Стандарт: "UNKNOWN".
+        DB_BASE_NAME (str) - Имя базы в БД. Стандарт: self.DB_USERNAME.
         DB_SSL (str) - Режим SSL. Стандарт: "prefer".
         DB_SSL_ROOTCERT (PathLike) - Путь к корневому сертификату БД. Стандарт: "". 
     '''
@@ -51,7 +51,7 @@ class Configuration:
         self.DB_PORT = environ.get('TGBOT_DB_PORT', 5432)
         self.DB_USERNAME = environ.get('TGBOT_DB_USERNAME', 'UNKNOWN')
         self.DB_PASSWORD = environ.get('TGBOT_DB_PASSWORD', 'UNKNOWN')
-        self.DB_BASE_NAME = environ.get('TGBOT_DB_BASE_NAME', 'UNKNOWN')
+        self.DB_BASE_NAME = environ.get('TGBOT_DB_BASE_NAME', self.DB_USERNAME)
         self.DB_SSL = environ.get('TGBOT_DB_SSL', 'prefer')
         self.DB_SSL_ROOTCERT = environ.get('TGBOT_DB_SSL_ROOTCERT', '')
 
