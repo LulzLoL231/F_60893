@@ -17,12 +17,10 @@ from database import Database
 
 
 cmds = [
-    BotCommand('start', 'Start'),
-    BotCommand('help', 'Help page'),
-    BotCommand('version', 'Bot version')
+    BotCommand('start', 'Start')
 ]
 
-getLogger(config.NAME).info(f'Telegram Bot {config.NAME} v{config.VERSION} Loading...')
+getLogger(config.NAME).info(f'Telegram Bot {config.NAME} v{config.VERSION}')
 loop = get_event_loop()
 bot = Dispatcher(
     Bot(config.getToken(), loop, parse_mode='HTML'),
@@ -30,9 +28,7 @@ bot = Dispatcher(
     storage=MemoryStorage()
 )
 langs = i18n.Languages()
-tempDB: Dict[str, Dict[int, Dict[str, Any]]] = {
-    'users': {}
-}
 db = Database()
 loop.run_until_complete(db.check_database())
 loop.run_until_complete(bot.bot.set_my_commands(cmds))
+bot_user = loop.run_until_complete(bot.bot.get_me())

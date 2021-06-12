@@ -5,19 +5,10 @@
 #
 import logging
 from os import environ
-from datetime import datetime
 
 
 BOT_NAME = 'F_60893'
-VERSION = '0.2.0'
-USR_TEMP = {
-    'uid': 0,
-    'registered': False,
-    'premium': False,
-    'premium_start': datetime.max,
-    'premium_end': datetime.min,
-    'lang': ''
-}
+VERSION = '0.8.8-beta'
 
 
 class Configuration:
@@ -39,8 +30,11 @@ class Configuration:
         DB_SSL_ROOTCERT (PathLike) - Путь к корневому сертификату БД. Стандарт: "". 
     '''
     def __init__(self) -> None:
+        self.DEV = True if bool(VERSION.endswith(
+            '-dev')) else bool(environ.get('TGBOT_DEV', False))
+        if self.DEV:
+            print('DEVELOPMENT MODE!')
         self.DEBUG = bool(environ.get('TGBOT_DEBUG', False))
-        self.DEV = bool(environ.get('TGBOT_DEV', False))
         self.TOKEN = str(environ.get('TGBOT_TOKEN', 'UNKNOWN'))
         self.TEST_TOKEN = str(environ.get('TGBOT_TEST_TOKEN', 'UNKNOWN'))
         self.VERSION = VERSION
@@ -54,6 +48,7 @@ class Configuration:
         self.DB_BASE_NAME = environ.get('TGBOT_DB_BASE_NAME', self.DB_USERNAME)
         self.DB_SSL = environ.get('TGBOT_DB_SSL', 'prefer')
         self.DB_SSL_ROOTCERT = environ.get('TGBOT_DB_SSL_ROOTCERT', '')
+        self.PREMIUM_DEFAULT_DAYS = 30
 
     def getToken(self) -> str:
         '''Возвращает Telegram Bot Token основываясь на состоянии self.debug.
@@ -68,5 +63,5 @@ config = Configuration()
 logging.basicConfig(
     format='[%(levelname)s] %(name)s (%(lineno)d) >> %(message)s',
     level=logging.DEBUG if config.DEBUG else logging.INFO)
-logging.getLogger('asyncio').setLevel(logging.DEBUG if config.DEV else logging.INFO)
-logging.getLogger('aiogram').setLevel(logging.DEBUG if config.DEV else logging.INFO)
+logging.getLogger('asyncio').setLevel(logging.INFO)
+logging.getLogger('aiogram').setLevel(logging.INFO)
