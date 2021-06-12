@@ -8,7 +8,6 @@ from aiogram.utils.executor import start_polling
 
 import cmds
 from runtime import bot
-from config import config
 
 
 if __name__ == '__main__':

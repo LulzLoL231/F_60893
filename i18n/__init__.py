@@ -25,13 +25,13 @@ class Language:
         self.language = language
         self.lang_dict = lang_dict
 
-    def get(self, word: str) -> str:
+    def t(self, word: str) -> str:
         if word in self.lang_dict.keys():
             return self.lang_dict[word]
         else:
             log.error(
                 f'"i18n.Language": For language "{self.language}" not found word "{word}"!')
-            return ''
+            return f'%{word}'
 
 
 class Languages:
