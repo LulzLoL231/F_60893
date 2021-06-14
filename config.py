@@ -8,26 +8,27 @@ from os import environ
 
 
 BOT_NAME = 'F_60893'
-VERSION = '0.9.8-alpha'
+VERSION = '0.9.10-alpha'
 
 
 class Configuration:
     '''Конфигурация бота.
 
     Args:
-        DEBUG (bool) - Дебаг режим. Стандарт: False.
-        DEV (bool) - Режим разработчика. Стандарт: False.
-        TOKEN (str) - Основной токен бота. Стандарт: "UNKNOWN".
-        TEST_TOKEN (str) - Тестовый токен бота. Стандарт: "UNKNOWN".
-        ADMIN_ID (int) - Telegram userID администратора. Стандарт: 0.
-        DEFAULT_LANG (str) - Стандартный язык для бота. Стандарт: "ru".
-        DB_HOST (str) - Хост БД. Стандарт: "localhost".
-        DB_PORT (int) - Порт БД. Стандарт: 5432.
-        DB_USERNAME (str) - Пользователь БД. Стандарт: "UNKNOWN".
-        DB_PASSWORD (str) - Пароль пользователя БД. Стандарт: "UNKNOWN".
-        DB_BASE_NAME (str) - Имя базы в БД. Стандарт: self.DB_USERNAME.
-        DB_SSL (str) - Режим SSL. Стандарт: "prefer".
-        DB_SSL_ROOTCERT (PathLike) - Путь к корневому сертификату БД. Стандарт: "". 
+        `TGBOT_DEBUG` (bool) - Дебаг режим. Стандарт: `False`.  
+        `TGBOT_DEV` (bool) - Режим разработчика. Стандарт: `False`.  
+        `TGBOT_TOKEN` (str) - Основной токен бота. Стандарт: `"UNKNOWN"`.  
+        `TGBOT_TEST_TOKEN` (str) - Тестовый токен бота. Стандарт: `"UNKNOWN"`.  
+        `TGBOT_ADMIN_ID` (int) - Telegram userID администратора. Стандарт: `0`.  
+        `TGBOT_DEFAULT_LANG` (str) - Стандартный язык для бота. Стандарт: `"ru"`.  
+        `DB_HOST` (str) - Хост БД. Стандарт: `"localhost"`.  
+        `DB_PORT` (int) - Порт БД. Стандарт: `5432`.  
+        `DB_USERNAME` (str) - Пользователь БД. Стандарт: `"UNKNOWN"`.  
+        `DB_PASSWORD` (str) - Пароль пользователя БД. Стандарт: `"UNKNOWN"`.  
+        `DB_BASE_NAME` (str) - Имя базы в БД. Стандарт: `"UNKNOWN"`.  
+        `DB_SSL` (str) - Режим SSL. Стандарт: `"prefer"`.  
+        `DB_SSL_ROOTCERT` (PathLike) - Путь к корневому сертификату БД. Стандарт: `""`.  
+        `DB_USERS_TABLE_NAME` (str) - Название таблицы пользователей в БД. Стандарт: `"bot_users"`.
     '''
     def __init__(self) -> None:
         self.DEV = True if bool(VERSION.endswith(
@@ -49,6 +50,7 @@ class Configuration:
         self.DB_SSL = environ.get('TGBOT_DB_SSL', 'prefer')
         self.DB_SSL_ROOTCERT = environ.get('TGBOT_DB_SSL_ROOTCERT', '')
         self.PREMIUM_DEFAULT_DAYS = 30
+        self.DB_USERS_TABLE_NAME = environ.get('TGBOT_DB_USERS_TABLE_NAME', 'bot_users')
 
     def getToken(self) -> str:
         '''Возвращает Telegram Bot Token основываясь на состоянии self.debug.
