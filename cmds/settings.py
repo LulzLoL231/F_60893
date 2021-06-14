@@ -38,13 +38,20 @@ async def settings(query: types.CallbackQuery):
     '''
     await query.answer()
     msg = query.message
+    log.info(f'"cmds.settings.settings": Called by {msg.chat.mention} ({str(msg.chat.id)})')
     await msg.answer_chat_action(types.ChatActions.TYPING)
     usr = await db.get_user(uid=msg.chat.id)
     if usr:
         lang = langs.get_language(usr['language'])
         cnt = f'{Emojis.settings} <b>{lang.t("settings_title")}</b>\n\n'
         cnt += f'{lang.t("user")}: '
-        cnt += f'<b>{"_".join([msg.chat.first_name, msg.chat.last_name])}#{str(msg.chat.id)}</b>\n'
+        if msg.chat.first_name:
+            if msg.chat.last_name:
+                cnt += f'<b>{"_".join([msg.chat.first_name, msg.chat.last_name])}#{str(msg.chat.id)}</b>\n'
+            else:
+                cnt += f'<b>{msg.chat.first_name}#{str(msg.chat.id)}</b>\n'
+        else:
+            cnt += f'<b>#{str(msg.chat.id)}</b>\n'
         cnt += f'{lang.t("premium")}: {Emojis.on if usr["premium"] else Emojis.off} <b>'
         cnt += lang.t('active') if usr['premium'] else lang.t('disabled')
         cnt += '</b>\n'
@@ -280,6 +287,8 @@ async def apis(query: types.CallbackQuery):
 @bot.callback_query_handler(lambda q: q.data == 'change_binance')
 async def change_binance_id(query: types.CallbackQuery):
     msg = query.message
+    log.info(
+        f'"cmds.settings.change_binance_id": Called by {msg.chat.mention} ({str(msg.chat.id)})')
     usr = await db.get_user(uid=msg.chat.id)
     lang = langs.get_language(usr["language"])
     await binanceStates.id.set()
@@ -289,6 +298,8 @@ async def change_binance_id(query: types.CallbackQuery):
 
 @bot.message_handler(state=binanceStates.id)
 async def change_binance_secret(msg: types.Message, state: FSMContext):
+    log.info(
+        f'"cmds.settings.change_binance_secret": Called by {msg.chat.mention} ({str(msg.chat.id)})')
     await msg.answer_chat_action(types.ChatActions.TYPING)
     await state.update_data({'id': msg.text, 'uid': msg.chat.id})
     usr = await db.get_user(uid=msg.chat.id)
@@ -299,6 +310,8 @@ async def change_binance_secret(msg: types.Message, state: FSMContext):
 
 @bot.message_handler(state=binanceStates.secret)
 async def change_binance_data(msg: types.Message, state: FSMContext):
+    log.info(
+        f'"cmds.settings.change_binance_data": Called by {msg.chat.mention} ({str(msg.chat.id)})')
     await msg.answer_chat_action(types.ChatActions.TYPING)
     data = await state.get_data()
     await state.finish()
@@ -318,6 +331,8 @@ async def change_binance_data(msg: types.Message, state: FSMContext):
 @bot.callback_query_handler(lambda q: q.data == 'change_gate')
 async def change_gate_id(query: types.CallbackQuery):
     msg = query.message
+    log.info(
+        f'"cmds.settings.change_gate_id": Called by {msg.chat.mention} ({str(msg.chat.id)})')
     usr = await db.get_user(uid=msg.chat.id)
     lang = langs.get_language(usr["language"])
     await gateStates.id.set()
@@ -327,6 +342,8 @@ async def change_gate_id(query: types.CallbackQuery):
 
 @bot.message_handler(state=gateStates.id)
 async def change_gate_secret(msg: types.Message, state: FSMContext):
+    log.info(
+        f'"cmds.settings.change_gate_secret": Called by {msg.chat.mention} ({str(msg.chat.id)})')
     await msg.answer_chat_action(types.ChatActions.TYPING)
     await state.update_data({'id': msg.text, 'uid': msg.chat.id})
     usr = await db.get_user(uid=msg.chat.id)
@@ -337,6 +354,8 @@ async def change_gate_secret(msg: types.Message, state: FSMContext):
 
 @bot.message_handler(state=gateStates.secret)
 async def change_gate_data(msg: types.Message, state: FSMContext):
+    log.info(
+        f'"cmds.settings.change_gate_data": Called by {msg.chat.mention} ({str(msg.chat.id)})')
     await msg.answer_chat_action(types.ChatActions.TYPING)
     data = await state.get_data()
     await state.finish()
