@@ -52,7 +52,6 @@ async def start(msg: types.Message, query: bool = False):
     '''
     log.info(f'"cmds.startup.start": Called by {msg.chat.mention} ({str(msg.chat.id)})')
     lang = langs.get_language()
-    # TODO: Make "First startup" sequence.
     cnt = f'<code>{lang.t("check_auth")}...</code>'
     if query:
         ev = await msg.edit_text(cnt)
@@ -172,9 +171,9 @@ async def fs_buy_sub_txid(msg: types.Message, state: FSMContext):
         await db.start_premium(uid=msg.chat.id, end=ending)
         await db.set_access(uid=msg.chat.id, access=True)
         cnt = f'{Emojis.ok} <b>{lang.t("thx_for_payment")}!</b>\n'
-        cnt += f'{lang.t("to")}: {ending.ctime()}.'
+        cnt += f'{lang.t("valid_until")}: {ending.ctime()}.'
         key.add(types.InlineKeyboardButton(
-            text=f'{Emojis.back} {lang.t("go_to_main")}',
+            text=f'{Emojis.key} {lang.t("go_to_main")}',
             callback_data='main_menu'
         ))
         await ev.edit_text(cnt)

@@ -20,3 +20,4 @@ class Emojis:
     back = '◀️'
     on = '🟢'
     off = '⚫️'
+    key = '🔑'
