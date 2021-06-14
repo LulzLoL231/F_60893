@@ -57,6 +57,7 @@ class Database:
         '''
         sql = '''CREATE TABLE IF NOT EXISTS bot_users (
             uid             integer NOT NULL PRIMARY KEY,
+            access          bool DEFAULT false,
             premium         bool DEFAULT false,
             premium_start   timestamp,
             premium_end     timestamp,
@@ -68,9 +69,24 @@ class Database:
             order_amount    integer DEFAULT 100,
             take_profit     integer DEFAULT 10,
             stop_market     integer DEFAULT 3
-        );
-        '''
+        );'''
         await conn.execute(sql)
+
+    @DBConnect
+    async def set_access(self, uid: int, access: bool, conn: Connection) -> bool:
+        '''Установка access.
+
+        Args:
+            uid (int): Telegram userID.
+            access (bool): Access to lk.
+            conn (Connection): DB connection.
+
+        Returns:
+            bool: Boolean.
+        '''
+        sql = 'UPDATE bot_users SET access=$1 WHERE uid=$2'
+        res = await conn.execute(sql, access, uid)
+        return bool(res)
 
     @DBConnect
     async def set_order_amount(self, uid: int, amount: int, conn: Connection) -> bool:

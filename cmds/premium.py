@@ -3,12 +3,12 @@
 #  F_60893 - cmds: premium.
 #  Created by LulzLoL231 at 12/6/21
 #
-from datetime import datetime, timedelta
 from logging import getLogger
+from datetime import datetime, timedelta
 
 from aiogram import types
-from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.dispatcher.storage import FSMContext
+from aiogram.dispatcher.filters.state import State, StatesGroup
 
 from runtime import bot, db, langs
 from emojis import Emojis
@@ -31,6 +31,7 @@ async def check_payment(txid: str) -> bool:
     Returns:
         bool: Boolean.
     '''
+    log.debug(f'"cmds.premium.check_payment": txid: {txid}')
     # TODO: Make real txid processing.
     if txid == '0':  # FIXME: for development
         return True
@@ -41,6 +42,8 @@ async def check_payment(txid: str) -> bool:
 async def query_settings(query: types.CallbackQuery):
     await query.answer()
     msg = query.message
+    log.info(
+        f'"cmds.premium.query_settings": Called by {msg.chat.mention} ({str(msg.chat.id)})')
     usr = await db.get_user(uid=msg.chat.id)
     if usr:
         lang = langs.get_language(usr['language'])
@@ -65,6 +68,8 @@ async def query_settings(query: types.CallbackQuery):
 async def check_txid(msg: types.Message, state: FSMContext):
     await state.finish()
     usr = await db.get_user(uid=msg.chat.id)
+    log.info(
+        f'"cmds.premium.check_txid": Called by {msg.chat.mention} ({str(msg.chat.id)})')
     lang = langs.get_language(usr['language'])
     ev = await msg.answer(f'TXID: <b>{msg.text}</b>\n<code>{lang.t("checking_payment")}...</code>')
     key = types.InlineKeyboardMarkup()

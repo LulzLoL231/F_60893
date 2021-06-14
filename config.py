@@ -8,7 +8,7 @@ from os import environ
 
 
 BOT_NAME = 'F_60893'
-VERSION = '0.8.8-beta'
+VERSION = '0.9.8-alpha'
 
 
 class Configuration:
