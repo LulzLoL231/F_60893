@@ -39,7 +39,7 @@ async def order(query: types.CallbackQuery):
     cnt = f'''{Emojis.usd} <b>{lang.t("order_status_active") if usr["premium"] else lang.t("order_status_disabled")}</b>
 
 <b>{lang.t("detail")}</b>
-{lang.t("amount")}: <b>{usr["amount"]}</b>
+{lang.t("amount")}: <b>{usr["order_amount"]}</b>
 {lang.t("take_profit")}: <b>{usr["take_profit"] if usr["take_profit"] else lang.t("not_used")}%</b>
 {lang.t("stop_market")}: <b>{usr["stop_market"] if usr["stop_market"] else lang.t("not_used")}%</b>
 '''

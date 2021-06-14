@@ -15,7 +15,8 @@
 `DB_PASSWORD` (str) - Пароль пользователя БД. Стандарт: `"UNKNOWN"`.  
 `DB_BASE_NAME` (str) - Имя базы в БД. Стандарт: `"UNKNOWN"`.  
 `DB_SSL` (str) - Режим SSL. Стандарт: `"prefer"`.  
-`DB_SSL_ROOTCERT` (PathLike) - Путь к корневому сертификату БД. Стандарт: `""`.
+`DB_SSL_ROOTCERT` (PathLike) - Путь к корневому сертификату БД. Стандарт: `""`.  
+`DB_USERS_TABLE_NAME` (str) - Название таблицы пользователей в БД. Стандарт: `"bot_users"`.
 
 ## Доступные языки
  * `ru` - Русский.

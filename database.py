@@ -47,21 +47,22 @@ class Database:
         res = await conn.fetchrow("SELECT to_regclass($1);", table)
         return bool(res['to_regclass'])
 
+    
 
     @DBConnect
-    async def _create_bot_users_table(self, conn: Connection) -> None:
-        '''Private func: Creates bot_users table.
+    async def _create_users_table(self, conn: Connection) -> None:
+        '''Private func: Creates users table.
 
         Args:
             conn (Connection): DB connection.
         '''
-        sql = '''CREATE TABLE IF NOT EXISTS bot_users (
+        sql = '''CREATE TABLE IF NOT EXISTS {} (
             uid             integer NOT NULL PRIMARY KEY,
             access          bool DEFAULT false,
             premium         bool DEFAULT false,
             premium_start   timestamp,
             premium_end     timestamp,
-            language        text DEFAULT \'ru\',
+            language        text DEFAULT 'ru',
             id_binance      text,
             secret_binance  text,
             id_gate         text,
@@ -69,7 +70,7 @@ class Database:
             order_amount    integer DEFAULT 100,
             take_profit     integer DEFAULT 10,
             stop_market     integer DEFAULT 3
-        );'''
+        );'''.format(config.DB_USERS_TABLE_NAME)
         await conn.execute(sql)
 
     @DBConnect
@@ -84,7 +85,7 @@ class Database:
         Returns:
             bool: Boolean.
         '''
-        sql = 'UPDATE bot_users SET access=$1 WHERE uid=$2'
+        sql = f'UPDATE {config.DB_USERS_TABLE_NAME} SET access=$1 WHERE uid=$2'
         res = await conn.execute(sql, access, uid)
         return bool(res)
 
@@ -100,7 +101,7 @@ class Database:
         Returns:
             bool: Boolean.
         '''
-        sql = 'UPDATE bot_users SET amount=$1 WHERE uid=$2'
+        sql = f'UPDATE {config.DB_USERS_TABLE_NAME} SET order_amount=$1 WHERE uid=$2'
         res = await conn.execute(sql, amount, uid)
         return bool(res)
 
@@ -116,7 +117,7 @@ class Database:
         Returns:
             bool: Boolean.
         '''
-        sql = 'UPDATE bot_users SET take_profit=$1 WHERE uid=$2'
+        sql = f'UPDATE {config.DB_USERS_TABLE_NAME} SET take_profit=$1 WHERE uid=$2'
         res = await conn.execute(sql, take_profit, uid)
         return bool(res)
 
@@ -132,7 +133,7 @@ class Database:
         Returns:
             bool: Boolean.
         '''
-        sql = 'UPDATE bot_users SET stop_market=$1 WHERE uid=$2'
+        sql = f'UPDATE {config.DB_USERS_TABLE_NAME} SET stop_market=$1 WHERE uid=$2'
         res = await conn.execute(sql, stop_market, uid)
         return bool(res)
 
@@ -149,7 +150,7 @@ class Database:
         Returns:
             bool: Boolean.
         '''
-        sql = 'UPDATE bot_users SET id_binance=$1, secret_binance=$2 WHERE uid=$3;'
+        sql = f'UPDATE {config.DB_USERS_TABLE_NAME} SET id_binance=$1, secret_binance=$2 WHERE uid=$3;'
         res = await conn.execute(sql, id, secret, uid)
 
     @DBConnect
@@ -165,7 +166,7 @@ class Database:
         Returns:
             bool: Boolean.
         '''
-        sql = 'UPDATE bot_users SET id_gate=$1, secret_gate=$2 WHERE uid=$3;'
+        sql = f'UPDATE {config.DB_USERS_TABLE_NAME} SET id_gate=$1, secret_gate=$2 WHERE uid=$3;'
         res = await conn.execute(sql, id, secret, uid)
 
     async def check_database(self) -> bool:
@@ -177,15 +178,15 @@ class Database:
         self.log.info('"database.Database.check_database": Checking DB...')
         stat = await self.check_connection()
         if stat:
-            users = await self._check_table_exists('bot_users')
+            users = await self._check_table_exists(config.DB_USERS_TABLE_NAME)
             if users:
                 self.log.info('"database.Database.check_database": Check complete!')
                 return True
             else:
-                self.log.warning('"database.Database.check_database": Table "bot_users" is not found! Creating...')
-                stat = await self._create_bot_users_table()
+                self.log.warning(f'"database.Database.check_database": Table "{config.DB_USERS_TABLE_NAME}" is not found! Creating...')
+                stat = await self._create_users_table()
                 if stat:
-                    self.log.info('"database.Database.cehck_database": Table "bot_users" successfull created!')
+                    self.log.info(f'"database.Database.cehck_database": Table "{config.DB_USERS_TABLE_NAME}" successfull created!')
         else:
             self.log.error('"database.Database.check_database": Error while checking connection!')
             return False
@@ -201,7 +202,7 @@ class Database:
         Returns:
             Optional[Union[dict, None]]: User dict or None.
         '''
-        res = await conn.fetchrow('SELECT * FROM bot_users WHERE uid = $1', uid)
+        res = await conn.fetchrow(f'SELECT * FROM {config.DB_USERS_TABLE_NAME} WHERE uid = $1', uid)
         if res:
             return dict(res)
         return None
@@ -217,7 +218,7 @@ class Database:
         Returns:
             bool: Boolean.
         '''
-        sql = 'INSERT INTO bot_users (uid, language) VALUES ($1, $2)'
+        sql = f'INSERT INTO {config.DB_USERS_TABLE_NAME} (uid, language) VALUES ($1, $2)'
         res = await conn.execute(sql, uid, 'ru')
         if res:
             return True
@@ -234,7 +235,7 @@ class Database:
         Returns:
             bool: Boolean.
         '''
-        sql = 'DELETE FROM bot_users WHERE uid=$1'
+        sql = f'DELETE FROM {config.DB_USERS_TABLE_NAME} WHERE uid=$1'
         res = await conn.execute(sql, uid)
         if res:
             return True
@@ -252,7 +253,7 @@ class Database:
         Returns:
             bool: Boolean.
         '''
-        sql = 'UPDATE bot_users SET language = $1 WHERE uid = $2'
+        sql = f'UPDATE {config.DB_USERS_TABLE_NAME} SET language = $1 WHERE uid = $2'
         res = await conn.execute(sql, lang, uid)
         return bool(res)
 
@@ -287,7 +288,7 @@ class Database:
         Returns:
             bool: Boolean.
         '''
-        sql = 'UPDATE bot_users SET premium=true, premium_start=$1, premium_end=$2 WHERE uid=$3'
+        sql = f'UPDATE {config.DB_USERS_TABLE_NAME} SET premium=true, premium_start=$1, premium_end=$2 WHERE uid=$3'
         res = await conn.execute(sql, datetime.now(), end, uid)
         return bool(res)
 
@@ -302,7 +303,8 @@ class Database:
         Returns:
             bool: Boolean.
         '''
-        res = await conn.execute('UPDATE bot_users SET premium=false, premium_start=null, premium_end=null WHERE uid=$1', uid)
+        sql = f'UPDATE {config.DB_USERS_TABLE_NAME} SET premium=false, premium_start=null, premium_end=null WHERE uid=$1'
+        res = await conn.execute(sql, uid)
         return bool(res)
 
     @DBConnect
@@ -316,7 +318,7 @@ class Database:
         Returns:
             Optional[Union[None, Dict[str, Any]]]: premium status or None.
         '''
-        res = await conn.fetchrow('SELECT premium, premium_start, premium_end FROM bot_users WHERE uid=$1', uid)
+        res = await conn.fetchrow(f'SELECT premium, premium_start, premium_end FROM {config.DB_USERS_TABLE_NAME} WHERE uid=$1', uid)
         if res:
             return dict(res)
         return None
