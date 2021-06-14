@@ -155,16 +155,12 @@ async def fs_chg_lang_ru(query: types.CallbackQuery):
     await first_startup(msg, usr)
 
 
-@bot.callback_query_handler(lambda q: q.data == 'fs_try_again')
-async def fs_try_again(query: types.CallbackQuery):
-    await fs_buy_sub(query)
-
-
 @bot.message_handler(state=txidStates.txid)
 async def fs_buy_sub_txid(msg: types.Message, state: FSMContext):
     log.info(
         f'"cmds.startup.fs_buy_sub_txid": Called by {msg.chat.mention} ({str(msg.chat.id)})')
     await msg.answer_chat_action(types.ChatActions.TYPING)
+    await state.finish()
     usr = await db.get_user(uid=msg.chat.id)
     lang = langs.get_language(usr['language'])
     ev = await msg.answer(f'<code>{lang.t("checking_payment")}...</code>')
@@ -183,6 +179,7 @@ async def fs_buy_sub_txid(msg: types.Message, state: FSMContext):
         ))
         await ev.edit_text(cnt)
     else:
-        key.add(types.InlineKeyboardButton(text=f'{Emojis.back} {lang.t("try_again")}', callback_data='fs_try_again'))
+        key.add(types.InlineKeyboardButton(
+            text=f'{Emojis.back} {lang.t("try_again")}', callback_data='fs_buy_sub'))
         await ev.edit_text(f'{Emojis.warning} {lang.t("payment_err")}!')
     await ev.edit_reply_markup(key)
