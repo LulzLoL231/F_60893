@@ -61,10 +61,6 @@ async def start(msg: types.Message, query: bool = False):
     usr = await db.get_user(uid=msg.chat.id)
     if usr is None:
         log.debug(f'"cmds.startup.start": User #{str(msg.chat.id)} not found in DB!')
-        if config.DEV:
-            log.debug(f'"cmds.startup.start": Registration disabled due development.')
-            await ev.edit_text(f'{Emojis.error} <b>{lang.t("user_404")}</b>!')
-            return None
         log.debug(f'"cmds.startup.start": Registration...')
         await ev.edit_text(f'<code>{lang.t("reg")}...</code>')
         stat = await db.add_user(uid=msg.chat.id)
@@ -114,7 +110,28 @@ async def first_startup(msg: types.Message, usr: Dict[str, Any]):
             text=f'{Emojis.english} {lang_eng.t("chg_lang")} {lang_eng.t("to")} {lang_eng.t("english")}',
             callback_data='fs_chg_lang_eng'
         ))
-    else:
+        lang_es = langs.get_language('es')
+        key.add(types.InlineKeyboardButton(
+            text=f'{Emojis.espanol} {lang_es.t("chg_lang")} {lang_es.t("to")} {lang_es.t("espanol")}',
+            callback_data='fs_chg_lang_es'
+        ))
+    elif usr['language'] == 'en':
+        lang_ru = langs.get_language('ru')
+        key.add(types.InlineKeyboardButton(
+            text=f'{Emojis.russia} {lang_ru.t("chg_lang")} {lang_ru.t("on")} {lang_ru.t("russian")}',
+            callback_data='fs_chg_lang_ru'
+        ))
+        lang_es = langs.get_language('es')
+        key.add(types.InlineKeyboardButton(
+            text=f'{Emojis.espanol} {lang_es.t("chg_lang")} {lang_es.t("to")} {lang_es.t("espanol")}',
+            callback_data='fs_chg_lang_es'
+        ))
+    elif usr['language'] == 'es':
+        lang_eng = langs.get_language('en')
+        key.add(types.InlineKeyboardButton(
+            text=f'{Emojis.english} {lang_eng.t("chg_lang")} {lang_eng.t("to")} {lang_eng.t("english")}',
+            callback_data='fs_chg_lang_eng'
+        ))
         lang_ru = langs.get_language('ru')
         key.add(types.InlineKeyboardButton(
             text=f'{Emojis.russia} {lang_ru.t("chg_lang")} {lang_ru.t("on")} {lang_ru.t("russian")}',
@@ -149,6 +166,19 @@ async def fs_chg_lang_ru(query: types.CallbackQuery):
     await db.set_user_lang(uid=msg.chat.id, lang='ru')
     usr = await db.get_user(uid=msg.chat.id)
     lang = langs.get_language('ru')
+    await query.answer()
+    await msg.edit_text(f'<code>{lang.t("language")} {lang.t("changed").lower()}!</code>')
+    await first_startup(msg, usr)
+
+
+@bot.callback_query_handler(lambda q: q.data == 'fs_chg_lang_es')
+async def fs_chg_lang_es(query: types.CallbackQuery):
+    msg = query.message
+    log.info(
+        f'"cmds.startup.fs_chg_lang_es": Called by {msg.chat.mention} ({str(msg.chat.id)})')
+    await db.set_user_lang(uid=msg.chat.id, lang='es')
+    usr = await db.get_user(uid=msg.chat.id)
+    lang = langs.get_language('es')
     await query.answer()
     await msg.edit_text(f'<code>{lang.t("language")} {lang.t("changed").lower()}!</code>')
     await first_startup(msg, usr)
