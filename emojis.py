@@ -14,6 +14,7 @@ class Emojis:
     no = '❌'
     russia = '🇷🇺'
     english = '🇬🇧'
+    espanol = '🇪🇸'
     pen = '✏️'
     usd = '💵'
     renew = '♻️'

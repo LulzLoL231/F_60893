@@ -75,9 +75,10 @@
     "on": "на",
     "russian": "Русский",
     "english": "Английский",
-    "changing_language": "Изменение языка",
+    "espanol": "Испанский",
     "back": "Назад",
     "go_to_main": "В кабинет",
     "try_again": "Попробовать ещё раз",
-    "valid_until": "Действует до"
+    "valid_until": "Действует до",
+    "choice_lang": "Выберите язык"
 }

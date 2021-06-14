@@ -1,9 +1,9 @@
 {
     "hi": "Hi",
-    "check_auth": "Await authorization",
+    "check_auth": "Wait for authorization",
     "reg": "Registration",
     "reg_ok": "Registration complete",
-    "reg_err": "Unsuccessfull registration",
+    "reg_err": "Unsuccessful registration",
     "user_recog": "User recognized",
     "admin_recog": "Admin recognized",
     "settings_title": "User settings",
@@ -64,10 +64,10 @@
     "change_gate": "Change Gate API data",
     "change_binance_id": "Enter Binance API ID",
     "change_binance_secret": "Enter Binance API secret",
-    "setted_binance": "API data Binance installed",
+    "setted_binance": "Binance API data installed",
     "change_gate_id": "Enter Gate API ID",
     "change_gate_secret": "Enter Gate API secret",
-    "setted_gate": "API data Gate installed",
+    "setted_gate": "Gate API data installed",
     "stock": "Stock",
     "fs_hi": "<b>Hi, {}!</b>\nBefore start using bot, you need to subscribe.",
     "pay_sub": "Pay subscription",
@@ -75,9 +75,10 @@
     "on": "to",
     "russian": "Russian",
     "english": "English",
-    "changing_language": "Changing language",
+    "espanol": "Espanol",
     "back": "Back",
     "go_to_main": "Go to profile",
     "try_again": "Try again",
-    "valid_until": "Valid until"
+    "valid_until": "Valid until",
+    "choice_lang": "Choice language"
 }

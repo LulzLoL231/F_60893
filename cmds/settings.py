@@ -38,7 +38,8 @@ async def settings(query: types.CallbackQuery):
     '''
     await query.answer()
     msg = query.message
-    log.info(f'"cmds.settings.settings": Called by {msg.chat.mention} ({str(msg.chat.id)})')
+    log.info(
+        f'"cmds.settings.settings": Called by {msg.chat.mention} ({str(msg.chat.id)})')
     await msg.answer_chat_action(types.ChatActions.TYPING)
     usr = await db.get_user(uid=msg.chat.id)
     if usr:
@@ -62,9 +63,11 @@ async def settings(query: types.CallbackQuery):
             cnt += f'<b>{usr["premium_end"].ctime()}</b>\n'
         cnt += f'{lang.t("lang")}: '
         if usr['language'] == 'ru':
-            cnt += f'{Emojis.russia} <b>Русский</b>.'
+            cnt += f'{Emojis.russia} <b>Русский</b>'
         elif usr['language'] == 'en':
             cnt += f'{Emojis.english} <b>English</b>'
+        elif usr['language'] == 'es':
+            cnt += f'{Emojis.espanol} <b>Espanol</b>'
         key = types.InlineKeyboardMarkup()
         if usr['premium'] is False:
             key.add(
@@ -126,18 +129,39 @@ async def change_lang(query: types.CallbackQuery):
     usr = await db.get_user(uid=msg.chat.id)
     if usr:
         lang = langs.get_language(usr['language'])
-        cnt = f'{lang.t("change")} {lang.t("lang").lower()}'
+        cnt = f'<b>{lang.t("choice_lang")}</b>'
         key = types.InlineKeyboardMarkup()
         if usr['language'] == 'ru':
             key.add(types.InlineKeyboardButton(
                 text=f'{Emojis.english} English',
                 callback_data='chg_lang_to_en'
             ))
+            key.add(types.InlineKeyboardButton(
+                text=f'{Emojis.espanol} Espanol',
+                callback_data='chg_lang_to_es'
+            ))
         elif usr['language'] == 'en':
             key.add(types.InlineKeyboardButton(
-                text=f'{Emojis.russia} Русский.',
+                text=f'{Emojis.russia} Русский',
                 callback_data='chg_lang_to_ru'
             ))
+            key.add(types.InlineKeyboardButton(
+                text=f'{Emojis.espanol} Espanol',
+                callback_data='chg_lang_to_es'
+            ))
+        elif usr['language'] == 'es':
+            key.add(types.InlineKeyboardButton(
+                text=f'{Emojis.english} English',
+                callback_data='chg_lang_to_en'
+            ))
+            key.add(types.InlineKeyboardButton(
+                text=f'{Emojis.russia} Русский',
+                callback_data='chg_lang_to_ru'
+            ))
+        key.add(types.InlineKeyboardButton(
+            text=f'{Emojis.back} {lang.t("back_to")} {lang.t("settings").lower()}',
+            callback_data='settings'
+        ))
         await msg.edit_text(cnt)
         await msg.edit_reply_markup(key)
 
@@ -157,7 +181,7 @@ async def chg_lang_to_en(query: types.CallbackQuery):
     usr = await db.get_user(uid=msg.chat.id)
     if usr:
         lang = langs.get_language(usr['language'])
-        await msg.edit_text(f'<code>{lang.t("changing_language")}"...</code>')
+        await msg.edit_text(f'<code>{lang.t("changing_lang")}...</code>')
         res = await db.set_user_lang(uid=msg.chat.id, lang='en')
         key = types.InlineKeyboardMarkup()
         if res:
@@ -189,8 +213,40 @@ async def chg_lang_to_ru(query: types.CallbackQuery):
     usr = await db.get_user(uid=msg.chat.id)
     if usr:
         lang = langs.get_language(usr['language'])
-        await msg.edit_text(f'<code>{lang.t("changing_language")}"...</code>')
+        await msg.edit_text(f'<code>{lang.t("changing_lang")}...</code>')
         res = await db.set_user_lang(uid=msg.chat.id, lang='ru')
+        key = types.InlineKeyboardMarkup()
+        if res:
+            usr = await db.get_user(uid=msg.chat.id)
+            lang = langs.get_language(usr['language'])
+            key.add(types.InlineKeyboardButton(
+                text=f'{Emojis.back} {lang.t("back_to")} {lang.t("settings").lower()}',
+                callback_data='settings'
+            ))
+            await msg.edit_text(f'<b>{lang.t("lang")} {lang.t("changed").lower()}!</b>')
+            await msg.edit_reply_markup(key)
+        else:
+            await msg.edit_text(f'{Emojis.error} <code>{lang.t("change_error")} {lang.t("lang").lower()}</code>')
+            await msg.edit_reply_markup(key)
+
+
+@bot.callback_query_handler(lambda q: q.data == 'chg_lang_to_es')
+async def chg_lang_to_es(query: types.CallbackQuery):
+    '''cmd "chg_lang_to_es": Изменение языка на испанский.
+
+    Args:
+        msg (types.CallbackQuery): Telegram message query.
+    '''
+    await query.answer()
+    msg = query.message
+    log.info(
+        f'"cmds.settings.chg_lang_to_es": Called by {msg.chat.mention} ({str(msg.chat.id)})')
+    await msg.answer_chat_action(types.ChatActions.TYPING)
+    usr = await db.get_user(uid=msg.chat.id)
+    if usr:
+        lang = langs.get_language(usr['language'])
+        await msg.edit_text(f'<code>{lang.t("changing_lang")}...</code>')
+        res = await db.set_user_lang(uid=msg.chat.id, lang='es')
         key = types.InlineKeyboardMarkup()
         if res:
             usr = await db.get_user(uid=msg.chat.id)
