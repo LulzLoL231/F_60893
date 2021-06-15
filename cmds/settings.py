@@ -369,6 +369,13 @@ async def apis(query: types.CallbackQuery):
     await msg.edit_reply_markup(key)
 
 
+@bot.callback_query_handler(lambda q: q.data == 'apis_state', state='*')
+async def apis_state(query: types.CallbackQuery):
+    state = bot.current_state(chat=query.message.chat.id)
+    await state.finish()
+    await apis(query)
+
+
 @bot.callback_query_handler(lambda q: q.data == 'change_binance')
 async def change_binance_id(query: types.CallbackQuery):
     msg = query.message
@@ -377,8 +384,14 @@ async def change_binance_id(query: types.CallbackQuery):
     usr = await db.get_user(uid=msg.chat.id)
     lang = langs.get_language(usr["language"])
     await binanceStates.id.set()
+    key = types.InlineKeyboardMarkup()
+    key.add(types.InlineKeyboardButton(
+        text=f'{Emojis.back} {lang.t("back_to")} {lang.t("apis").lower()}',
+        callback_data='apis_state'
+    ))
     await query.answer()
     await msg.edit_text(f'{lang.t("change_binance_id")}')
+    await msg.edit_reply_markup(key)
 
 
 @bot.message_handler(state=binanceStates.id)
@@ -390,7 +403,12 @@ async def change_binance_secret(msg: types.Message, state: FSMContext):
     usr = await db.get_user(uid=msg.chat.id)
     lang = langs.get_language(usr['language'])
     await binanceStates.secret.set()
-    await msg.answer(lang.t('change_binance_secret'))
+    key = types.InlineKeyboardMarkup()
+    key.add(types.InlineKeyboardButton(
+        text=f'{Emojis.back} {lang.t("back_to")} {lang.t("apis").lower()}',
+        callback_data='apis_state'
+    ))
+    await msg.answer(lang.t('change_binance_secret'), reply_markup=key)
 
 
 @bot.message_handler(state=binanceStates.secret)
