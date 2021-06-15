@@ -24,11 +24,6 @@ class binanceStates(StatesGroup):
     secret = State()
 
 
-class gateStates(StatesGroup):
-    id = State()
-    secret = State()
-
-
 @bot.callback_query_handler(lambda q: q.data == 'settings')
 async def settings(query: types.CallbackQuery):
     '''cmd "settings": Управление настройками пользователя.
@@ -36,11 +31,9 @@ async def settings(query: types.CallbackQuery):
     Args:
         msg (types.Message): Telegram message.
     '''
-    await query.answer()
     msg = query.message
     log.info(
         f'"cmds.settings.settings": Called by {msg.chat.mention} ({str(msg.chat.id)})')
-    await msg.answer_chat_action(types.ChatActions.TYPING)
     usr = await db.get_user(uid=msg.chat.id)
     if usr:
         lang = langs.get_language(usr['language'])
@@ -105,12 +98,14 @@ async def settings(query: types.CallbackQuery):
                 callback_data='main_menu'
             )
         )
+        await query.answer()
         if msg.from_user != bot_user:
             await msg.answer(cnt, reply_markup=key)
         else:
             await msg.edit_text(cnt)
             await msg.edit_reply_markup(key)
     else:
+        await query.answer()
         await msg.edit_text(f'<code>{langs.get_language(config.DEFAULT_LANG).t("user_404")}</code>')
 
 
@@ -121,11 +116,9 @@ async def change_lang(query: types.CallbackQuery):
     Args:
         msg (types.CallbackQuery): Telegram message query.
     '''
-    await query.answer()
     msg = query.message
     log.info(
         f'"cmds.settings.change_lang": Called by {msg.chat.mention} ({str(msg.chat.id)})')
-    await msg.answer_chat_action(types.ChatActions.TYPING)
     usr = await db.get_user(uid=msg.chat.id)
     if usr:
         lang = langs.get_language(usr['language'])
@@ -162,8 +155,12 @@ async def change_lang(query: types.CallbackQuery):
             text=f'{Emojis.back} {lang.t("back_to")} {lang.t("settings").lower()}',
             callback_data='settings'
         ))
+        await query.answer()
         await msg.edit_text(cnt)
         await msg.edit_reply_markup(key)
+    else:
+        await query.answer()
+        await msg.edit_text(f'<code>{langs.get_language(config.DEFAULT_LANG).t("user_404")}</code>')
 
 
 @bot.callback_query_handler(lambda q: q.data == 'chg_lang_to_en')
@@ -173,15 +170,14 @@ async def chg_lang_to_en(query: types.CallbackQuery):
     Args:
         msg (types.CallbackQuery): Telegram message query.
     '''
-    await query.answer()
     msg = query.message
     log.info(
         f'"cmds.settings.chg_lang_to_en": Called by {msg.chat.mention} ({str(msg.chat.id)})')
-    await msg.answer_chat_action(types.ChatActions.TYPING)
     usr = await db.get_user(uid=msg.chat.id)
     if usr:
         lang = langs.get_language(usr['language'])
-        await msg.edit_text(f'<code>{lang.t("changing_lang")}...</code>')
+        await query.answer()
+        await msg.answer_chat_action(types.ChatActions.TYPING)
         res = await db.set_user_lang(uid=msg.chat.id, lang='en')
         key = types.InlineKeyboardMarkup()
         if res:
@@ -196,6 +192,9 @@ async def chg_lang_to_en(query: types.CallbackQuery):
         else:
             await msg.edit_text(f'{Emojis.error} <code>{lang.t("change_error")} {lang.t("lang")}</code>')
             await msg.edit_reply_markup(key)
+    else:
+        await query.answer()
+        await msg.edit_text(f'<code>{langs.get_language(config.DEFAULT_LANG).t("user_404")}</code>')
 
 
 @bot.callback_query_handler(lambda q: q.data == 'chg_lang_to_ru')
@@ -205,15 +204,14 @@ async def chg_lang_to_ru(query: types.CallbackQuery):
     Args:
         msg (types.CallbackQuery): Telegram message query.
     '''
-    await query.answer()
     msg = query.message
     log.info(
         f'"cmds.settings.chg_lang_to_ru": Called by {msg.chat.mention} ({str(msg.chat.id)})')
-    await msg.answer_chat_action(types.ChatActions.TYPING)
     usr = await db.get_user(uid=msg.chat.id)
     if usr:
         lang = langs.get_language(usr['language'])
-        await msg.edit_text(f'<code>{lang.t("changing_lang")}...</code>')
+        await query.answer()
+        await msg.answer_chat_action(types.ChatActions.TYPING)
         res = await db.set_user_lang(uid=msg.chat.id, lang='ru')
         key = types.InlineKeyboardMarkup()
         if res:
@@ -228,6 +226,9 @@ async def chg_lang_to_ru(query: types.CallbackQuery):
         else:
             await msg.edit_text(f'{Emojis.error} <code>{lang.t("change_error")} {lang.t("lang").lower()}</code>')
             await msg.edit_reply_markup(key)
+    else:
+        await query.answer()
+        await msg.edit_text(f'<code>{langs.get_language(config.DEFAULT_LANG).t("user_404")}</code>')
 
 
 @bot.callback_query_handler(lambda q: q.data == 'chg_lang_to_es')
@@ -237,15 +238,14 @@ async def chg_lang_to_es(query: types.CallbackQuery):
     Args:
         msg (types.CallbackQuery): Telegram message query.
     '''
-    await query.answer()
     msg = query.message
     log.info(
         f'"cmds.settings.chg_lang_to_es": Called by {msg.chat.mention} ({str(msg.chat.id)})')
-    await msg.answer_chat_action(types.ChatActions.TYPING)
     usr = await db.get_user(uid=msg.chat.id)
     if usr:
         lang = langs.get_language(usr['language'])
-        await msg.edit_text(f'<code>{lang.t("changing_lang")}...</code>')
+        await query.answer()
+        await msg.answer_chat_action(types.ChatActions.TYPING)
         res = await db.set_user_lang(uid=msg.chat.id, lang='es')
         key = types.InlineKeyboardMarkup()
         if res:
@@ -260,11 +260,14 @@ async def chg_lang_to_es(query: types.CallbackQuery):
         else:
             await msg.edit_text(f'{Emojis.error} <code>{lang.t("change_error")} {lang.t("lang").lower()}</code>')
             await msg.edit_reply_markup(key)
+    else:
+        await query.answer()
+        await msg.edit_text(f'<code>{langs.get_language(config.DEFAULT_LANG).t("user_404")}</code>')
 
 
 @bot.callback_query_handler(lambda q: q.data == 'delete_user')
 async def delete_user(query: types.CallbackQuery):
-    '''cmd "delete_user": Удалить пользователя.
+    '''cmd "delete_user": Запрос на удаление пользователя.
 
     Args:
         msg (types.CallbackQuery): Telegram message query.
@@ -274,6 +277,42 @@ async def delete_user(query: types.CallbackQuery):
         f'"cmds.settings.delete_user": Called by {msg.chat.mention} ({str(msg.chat.id)})')
     usr = await db.get_user(uid=msg.chat.id)
     key = types.InlineKeyboardMarkup()
+    if usr:
+        lang = langs.get_language(usr['language'])
+        key.add(types.InlineKeyboardButton(
+            text=lang.t('confirm'),
+            callback_data='confirmed_delete_user'
+        ))
+        key.add(types.InlineKeyboardButton(
+            text=f'{Emojis.back} {lang.t("back_to")} {lang.t("settings").lower()}',
+            callback_data='settings'
+        ))
+        await query.answer()
+        await msg.edit_text(lang.t('user_del_warn'))
+        await msg.edit_reply_markup(key)
+    else:
+        lang = langs.get_language(config.DEFAULT_LANG)
+        key.add(types.InlineKeyboardButton(
+            text=f'{Emojis.back} {lang.t("back_to")} {lang.t("settings").lower()}',
+            callback_data='settings'
+        ))
+        await query.answer()
+        await msg.edit_text(f'{Emojis.error} <code>{lang.t("change_error")} {lang.t("lang").lower()}</code>')
+        await msg.edit_reply_markup(key)
+
+
+@bot.callback_query_handler(lambda q: q.data == 'confirmed_delete_user')
+async def confirmed_delete_user(query: types.CallbackQuery):
+    '''cmd "confirmed_delete_user": Удаляет пользователя из БД.
+
+    Args:
+        msg (types.CallbackQuery): Telegram message query.
+    '''
+    msg = query.message
+    log.info(
+        f'"cmds.settings.confirmed_delete_user": Called by {msg.chat.mention} ({str(msg.chat.id)})')
+    usr = await db.get_user(uid=msg.chat.id)
+    key = types.InlineKeyboardMarkup()
     await query.answer()
     if usr:
         lang = langs.get_language(usr['language'])
@@ -281,6 +320,7 @@ async def delete_user(query: types.CallbackQuery):
         await msg.answer_chat_action(types.ChatActions.TYPING)
         res = await db.del_user(uid=usr['uid'])
         if res:
+            log.info(f'"cmds.settings.confirmed_delete_user": User #{str(msg.chat.id)} has been deleted from DB!')
             await msg.edit_text(f'{Emojis.ok} <b>{lang.t("delete_ok")}</b>')
         else:
             await msg.edit_text(f'{Emojis.error} <b>{lang.t("delete_err")}</b>')
@@ -306,12 +346,8 @@ async def apis(query: types.CallbackQuery):
         f'"cmds.settings.apis": Called by {msg.chat.mention} ({str(msg.chat.id)})')
     usr = await db.get_user(uid=msg.chat.id)
     key = types.InlineKeyboardMarkup()
-    await query.answer()
     lang = langs.get_language(usr['language'])
-    await msg.edit_text(f'<code>{lang.t("fetching_apis")}...</code>')
-    await msg.answer_chat_action(types.ChatActions.TYPING)
     binance = (usr["id_binance"] and usr["secret_binance"])
-    gate = (usr["id_gate"] and usr["secret_gate"])
     cnt = f'''{Emojis.settings} {lang.t("settings")} {lang.t("apis")}
 
 <b>{lang.t("stock")}: Binance</b>
@@ -319,23 +355,16 @@ async def apis(query: types.CallbackQuery):
 '''
     if binance:
         cnt += f'API ID: <code>{usr["id_binance"]}</code>'
-    cnt += f'\n\n<b>{lang.t("stock")}: Gate</b>\n'
-    cnt += f'{lang.t("status")}: {Emojis.ok if gate else Emojis.no} {lang.t("setted") if gate else lang.t("not_setted")}'
-    if gate:
-        cnt += f'\nAPI ID: <code>{usr["id_gate"]}</code>'
     key = types.InlineKeyboardMarkup()
     key.add(types.InlineKeyboardButton(
         text=f'{Emojis.pen} {lang.t("change_binance")}',
         callback_data='change_binance'
     ))
     key.add(types.InlineKeyboardButton(
-        text=f'{Emojis.pen} {lang.t("change_gate")}',
-        callback_data='change_gate'
-    ))
-    key.add(types.InlineKeyboardButton(
         text=f'{Emojis.back} {lang.t("back_to")} {lang.t("settings").lower()}',
         callback_data='settings'
     ))
+    await query.answer()
     await msg.edit_text(cnt)
     await msg.edit_reply_markup(key)
 
@@ -381,48 +410,4 @@ async def change_binance_data(msg: types.Message, state: FSMContext):
         callback_data='apis'
     ))
     await ev.edit_text(f'{Emojis.ok} {lang.t("setted_binance")}!')
-    await ev.edit_reply_markup(key)
-
-
-@bot.callback_query_handler(lambda q: q.data == 'change_gate')
-async def change_gate_id(query: types.CallbackQuery):
-    msg = query.message
-    log.info(
-        f'"cmds.settings.change_gate_id": Called by {msg.chat.mention} ({str(msg.chat.id)})')
-    usr = await db.get_user(uid=msg.chat.id)
-    lang = langs.get_language(usr["language"])
-    await gateStates.id.set()
-    await query.answer()
-    await msg.edit_text(f'{lang.t("change_gate_id")}')
-
-
-@bot.message_handler(state=gateStates.id)
-async def change_gate_secret(msg: types.Message, state: FSMContext):
-    log.info(
-        f'"cmds.settings.change_gate_secret": Called by {msg.chat.mention} ({str(msg.chat.id)})')
-    await msg.answer_chat_action(types.ChatActions.TYPING)
-    await state.update_data({'id': msg.text, 'uid': msg.chat.id})
-    usr = await db.get_user(uid=msg.chat.id)
-    lang = langs.get_language(usr['language'])
-    await gateStates.secret.set()
-    await msg.answer(lang.t('change_gate_secret'))
-
-
-@bot.message_handler(state=gateStates.secret)
-async def change_gate_data(msg: types.Message, state: FSMContext):
-    log.info(
-        f'"cmds.settings.change_gate_data": Called by {msg.chat.mention} ({str(msg.chat.id)})')
-    await msg.answer_chat_action(types.ChatActions.TYPING)
-    data = await state.get_data()
-    await state.finish()
-    usr = await db.get_user(uid=data['uid'])
-    lang = langs.get_language(usr['language'])
-    ev = await msg.answer(f'<code>{lang.t("changing")}...</code>')
-    await db.set_gate(uid=data['uid'], id=data['id'], secret=msg.text)
-    key = types.InlineKeyboardMarkup()
-    key.add(types.InlineKeyboardButton(
-        text=f'{Emojis.back} {lang.t("back_to")} {lang.t("apis").lower()}',
-        callback_data='apis'
-    ))
-    await ev.edit_text(f'{Emojis.ok} {lang.t("setted_gate")}!')
     await ev.edit_reply_markup(key)

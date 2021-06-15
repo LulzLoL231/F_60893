@@ -40,7 +40,6 @@ async def check_payment(txid: str) -> bool:
 
 @bot.callback_query_handler(lambda q: q.data == 'buy_premium')
 async def query_settings(query: types.CallbackQuery):
-    await query.answer()
     msg = query.message
     log.info(
         f'"cmds.premium.query_settings": Called by {msg.chat.mention} ({str(msg.chat.id)})')
@@ -52,20 +51,25 @@ async def query_settings(query: types.CallbackQuery):
             text=f'{Emojis.back} {lang.t("back_to")} {lang.t("settings").lower()}',
             callback_data='settings'
         ))
-        await msg.edit_text(f'<code>{lang.t("check_premium")}...</code>')
         premium = await db.get_premium(uid=usr['uid'])
         if premium['premium']:
             cnt = f'{Emojis.on} {lang.t("premium_active")}\n'
             cnt += f'{lang.t("from")}: {premium["premium_start"].ctime()}'
             cnt += f'{lang.t("to")}: {premium["premium_end"].ctime()}'
+            await query.answer()
             await msg.edit_text(cnt)
         else:
             await txidStates.getState.set()
+            await query.answer()
             await msg.edit_text(f'<b>{lang.t("enter_txid")}</b>')
+    else:
+        await query.answer()
+        await msg.edit_text(f'<code>{langs.get_language(config.DEFAULT_LANG).t("user_404")}</code>')
 
 
 @bot.message_handler(state=txidStates.getState)
 async def check_txid(msg: types.Message, state: FSMContext):
+    await msg.answer_chat_action(types.ChatActions.TYPING)
     await state.finish()
     usr = await db.get_user(uid=msg.chat.id)
     log.info(
