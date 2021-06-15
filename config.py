@@ -8,7 +8,7 @@ from os import environ
 
 
 BOT_NAME = 'F_60893'
-VERSION = '0.11.2-alpha'
+VERSION = '0.12.0-alpha'
 
 
 class Configuration:
@@ -65,5 +65,6 @@ config = Configuration()
 logging.basicConfig(
     format='[%(levelname)s] %(name)s (%(lineno)d) >> %(message)s',
     level=logging.DEBUG if config.DEBUG else logging.INFO)
-logging.getLogger('asyncio').setLevel(logging.INFO)
-logging.getLogger('aiogram').setLevel(logging.INFO)
+if config.DEV is False:
+    logging.getLogger('asyncio').setLevel(logging.INFO)
+    logging.getLogger('aiogram').setLevel(logging.INFO)

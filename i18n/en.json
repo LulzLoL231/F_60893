@@ -80,5 +80,11 @@
     "go_to_main": "Go to profile",
     "try_again": "Try again",
     "valid_until": "Valid until",
-    "choice_lang": "Choice language"
+    "choice_lang": "Choice language",
+    "user_del_warn": "<b>[WARNING]</b>\n\nBy confirming the deletion, you realize that you will lose access to the bot, and you will have to pay again for your subscription to continue using the bot!\n<i>Be carefully</i>.\n\n<code>Confirm deletion</code>.",
+    "confirm": "Confirm",
+    "must_be_digit": "Must be digit",
+    "from_10_to_250000": "Allowed amount from 10 USDT to 250000 USDT",
+    "from_0_to_100": "Allowed {} from 0 to 100%",
+    "dont_use": "Do not use"
 }

@@ -65,8 +65,6 @@ class Database:
             language        text DEFAULT 'ru',
             id_binance      text,
             secret_binance  text,
-            id_gate         text,
-            secret_gate     text,
             order_amount    integer DEFAULT 100,
             take_profit     integer DEFAULT 10,
             stop_market     integer DEFAULT 3
@@ -151,22 +149,6 @@ class Database:
             bool: Boolean.
         '''
         sql = f'UPDATE {config.DB_USERS_TABLE_NAME} SET id_binance=$1, secret_binance=$2 WHERE uid=$3;'
-        res = await conn.execute(sql, id, secret, uid)
-
-    @DBConnect
-    async def set_gate(self, uid: int, id: str, secret: str, conn: Connection) -> bool:
-        '''Установка ключей для Gate.
-
-        Args:
-            uid (int): Telegram userID.
-            id (str): Gate API ID.
-            secret (str): Gate API secret.
-            conn (Connection): DB connection.
-
-        Returns:
-            bool: Boolean.
-        '''
-        sql = f'UPDATE {config.DB_USERS_TABLE_NAME} SET id_gate=$1, secret_gate=$2 WHERE uid=$3;'
         res = await conn.execute(sql, id, secret, uid)
 
     async def check_database(self) -> bool:

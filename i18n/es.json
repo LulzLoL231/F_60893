@@ -80,5 +80,11 @@
     "go_to_main": "Ir al perfil",
     "try_again": "Intentar otra vez",
     "valid_until": "Válido hasta",
-    "choice_lang": "Elige idioma"
+    "choice_lang": "Elige idioma",
+    "user_del_warn": "<b>[ADVERTENCIA]</b>Al confirmar la eliminación, se da cuenta de que perderá el acceso al bot y tendrá que pagar su suscripción nuevamente para continuar usando el bot.\n<i>Se cuidadoso</i>.\n\n<code>Confirmar la eliminación</code>.",
+    "confirm": "Confirmo",
+    "must_be_digit": "Debe ser numérico",
+    "from_10_to_250000": "Monto de pedido permitido: de 10 USDT a 250000 USDT",
+    "from_0_to_100": "{} permitido de 0 a 100%",
+    "dont_use": "No utilice"
 }
