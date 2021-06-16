@@ -57,17 +57,20 @@ class Database:
             conn (Connection): DB connection.
         '''
         sql = '''CREATE TABLE IF NOT EXISTS {} (
-            uid             integer NOT NULL PRIMARY KEY,
-            access          bool DEFAULT false,
-            premium         bool DEFAULT false,
-            premium_start   timestamp,
-            premium_end     timestamp,
-            language        text DEFAULT 'ru',
-            id_binance      text,
-            secret_binance  text,
-            order_amount    integer DEFAULT 100,
-            take_profit     integer DEFAULT 10,
-            stop_market     integer DEFAULT 3
+            uid                  integer NOT NULL PRIMARY KEY,
+            access               bool DEFAULT false,
+            premium              bool DEFAULT false,
+            premium_start        timestamp,
+            premium_end          timestamp,
+            language             text DEFAULT 'ru',
+            id_binance           text,
+            secret_binance       text,
+            order_amount_usdt    integer DEFAULT 100,
+            take_profit_usdt     integer DEFAULT 10,
+            stop_market_usdt     integer DEFAULT 3,
+            order_amount_doge    integer DEFAULT 100,
+            take_profit_doge     integer DEFAULT 10,
+            stop_market_doge     integer DEFAULT 3
         );'''.format(config.DB_USERS_TABLE_NAME)
         await conn.execute(sql)
 
@@ -88,8 +91,8 @@ class Database:
         return bool(res)
 
     @DBConnect
-    async def set_order_amount(self, uid: int, amount: int, conn: Connection) -> bool:
-        '''Установка суммы ордера.
+    async def set_order_amount_usdt(self, uid: int, amount: int, conn: Connection) -> bool:
+        '''Установка суммы ордера для USDT.
 
         Args:
             uid (int): Telegram userID.
@@ -99,13 +102,13 @@ class Database:
         Returns:
             bool: Boolean.
         '''
-        sql = f'UPDATE {config.DB_USERS_TABLE_NAME} SET order_amount=$1 WHERE uid=$2'
+        sql = f'UPDATE {config.DB_USERS_TABLE_NAME} SET order_amount_usdt=$1 WHERE uid=$2'
         res = await conn.execute(sql, amount, uid)
         return bool(res)
 
     @DBConnect
-    async def set_take_profit(self, uid: int, take_profit: int, conn: Connection) -> bool:
-        '''Установка take profit.
+    async def set_take_profit_usdt(self, uid: int, take_profit: int, conn: Connection) -> bool:
+        '''Установка take profit для USDT.
 
         Args:
             uid (int): Telegram userID.
@@ -115,13 +118,13 @@ class Database:
         Returns:
             bool: Boolean.
         '''
-        sql = f'UPDATE {config.DB_USERS_TABLE_NAME} SET take_profit=$1 WHERE uid=$2'
+        sql = f'UPDATE {config.DB_USERS_TABLE_NAME} SET take_profit_usdt=$1 WHERE uid=$2'
         res = await conn.execute(sql, take_profit, uid)
         return bool(res)
 
     @DBConnect
-    async def set_stop_market(self, uid: int, stop_market: int, conn: Connection) -> bool:
-        '''Установка stop_market.
+    async def set_stop_market_usdt(self, uid: int, stop_market: int, conn: Connection) -> bool:
+        '''Установка stop_market для USDT.
 
         Args:
             uid (int): Telegram userID.
@@ -131,7 +134,55 @@ class Database:
         Returns:
             bool: Boolean.
         '''
-        sql = f'UPDATE {config.DB_USERS_TABLE_NAME} SET stop_market=$1 WHERE uid=$2'
+        sql = f'UPDATE {config.DB_USERS_TABLE_NAME} SET stop_market_usdt=$1 WHERE uid=$2'
+        res = await conn.execute(sql, stop_market, uid)
+        return bool(res)
+
+    @DBConnect
+    async def set_order_amount_doge(self, uid: int, amount: int, conn: Connection) -> bool:
+        '''Установка суммы ордера для Doge.
+
+        Args:
+            uid (int): Telegram userID.
+            amount (int): Orger amount.
+            conn (Connection): DB connection.
+
+        Returns:
+            bool: Boolean.
+        '''
+        sql = f'UPDATE {config.DB_USERS_TABLE_NAME} SET order_amount_doge=$1 WHERE uid=$2'
+        res = await conn.execute(sql, amount, uid)
+        return bool(res)
+
+    @DBConnect
+    async def set_take_profit_doge(self, uid: int, take_profit: int, conn: Connection) -> bool:
+        '''Установка take profit для Doge.
+
+        Args:
+            uid (int): Telegram userID.
+            take_profit (int): Take profit %.
+            conn (Connection): DB connection.
+
+        Returns:
+            bool: Boolean.
+        '''
+        sql = f'UPDATE {config.DB_USERS_TABLE_NAME} SET take_profit_doge=$1 WHERE uid=$2'
+        res = await conn.execute(sql, take_profit, uid)
+        return bool(res)
+
+    @DBConnect
+    async def set_stop_market_doge(self, uid: int, stop_market: int, conn: Connection) -> bool:
+        '''Установка stop_market для Doge.
+
+        Args:
+            uid (int): Telegram userID.
+            stop_market (int): Stop market %.
+            conn (Connection): DB connection.
+
+        Returns:
+            bool: Boolean.
+        '''
+        sql = f'UPDATE {config.DB_USERS_TABLE_NAME} SET stop_market_doge=$1 WHERE uid=$2'
         res = await conn.execute(sql, stop_market, uid)
         return bool(res)
 
