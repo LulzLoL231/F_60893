@@ -65,7 +65,7 @@ async def settings(query: types.CallbackQuery):
         if usr['premium'] is False:
             key.add(
                 types.InlineKeyboardButton(
-                    text=f'{Emojis.usd} {lang.t("buy")} {lang.t("premium").lower()}',
+                    text=f'{Emojis.usd} {lang.t("pay_sub")}',
                     callback_data='buy_premium'
                 )
             )

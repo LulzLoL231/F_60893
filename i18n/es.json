@@ -86,5 +86,12 @@
     "must_be_digit": "Debe ser numérico",
     "from_10_to_250000": "Monto de pedido permitido: de 10 USDT a 250000 USDT",
     "from_0_to_100": "{} permitido de 0 a 100%",
-    "dont_use": "No utilice"
+    "dont_use": "No utilice",
+    "plz_install_apis": "Antes de usar el bot, configure la API",
+    "how_much_mon": "¿Por cuánto tiempo te suscribes?",
+    "mon1": "Mes",
+    "mon2": "Del mes",
+    "mon3": "Meses",
+    "forever": "Por vida",
+    "you_must_paid": "Deberías haber pagado {} USDT"
 }

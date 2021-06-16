@@ -31,9 +31,99 @@ async def fs_buy_sub(query: types.CallbackQuery):
         f'"cmds.startup.fs_buy_sub": Called by {msg.chat.mention} ({str(msg.chat.id)})')
     usr = await db.get_user(msg.chat.id)
     lang = langs.get_language(usr['language'])
-    await txidStates.txid.set()
+    key = types.InlineKeyboardMarkup()
+    key.row(
+        types.InlineKeyboardButton(
+            text=f'1 {lang.t("mon1")}',
+            callback_data='sub_200'
+        ),
+        types.InlineKeyboardButton(
+            text=f'3 {lang.t("mon2")}',
+            callback_data='sub_540'
+        )
+    )
+    key.row(
+        types.InlineKeyboardButton(
+            text=f'6 {lang.t("mon3")}',
+            callback_data='sub_1000'
+        ),
+        types.InlineKeyboardButton(
+            text=f'12 {lang.t("mon3")}',
+            callback_data='sub_1900'
+        )
+    )
+    key.row(types.InlineKeyboardButton(
+        text=f'{lang.t("forever")}',
+        callback_data='sub_4000'
+    ))
     await query.answer()
-    await msg.edit_text(f'{lang.t("enter_txid")}')
+    await msg.edit_text(f'{lang.t("how_much_mon")}?')
+    await msg.edit_reply_markup(key)
+
+
+@bot.callback_query_handler(lambda q: q.data == 'sub_200')
+async def sub_200(query: types.CallbackQuery):
+    msg = query.message
+    log.info(
+        f'"cmds.startup.sub_200": Called by {msg.chat.mention} ({str(msg.chat.id)})')
+    usr = await db.get_user(msg.chat.id)
+    lang = langs.get_language(usr['language'])
+    state = bot.current_state(chat=msg.chat.id)
+    await txidStates.txid.set()
+    await state.update_data({'exp': config.PREMIUMS[200], 'usdt': 200})
+    await msg.edit_text(f'<b>{lang.t("you_must_paid").format("200")}</b>\n{lang.t("enter_txid")}')
+
+
+@bot.callback_query_handler(lambda q: q.data == 'sub_540')
+async def sub_540(query: types.CallbackQuery):
+    msg = query.message
+    log.info(
+        f'"cmds.startup.sub_540": Called by {msg.chat.mention} ({str(msg.chat.id)})')
+    usr = await db.get_user(msg.chat.id)
+    lang = langs.get_language(usr['language'])
+    state = bot.current_state(chat=msg.chat.id)
+    await txidStates.txid.set()
+    await state.update_data({'exp': config.PREMIUMS[540], 'usdt': 540})
+    await msg.edit_text(f'<b>{lang.t("you_must_paid").format("540")}</b>\n{lang.t("enter_txid")}')
+
+
+@bot.callback_query_handler(lambda q: q.data == 'sub_1000')
+async def sub_1000(query: types.CallbackQuery):
+    msg = query.message
+    log.info(
+        f'"cmds.startup.sub_1000": Called by {msg.chat.mention} ({str(msg.chat.id)})')
+    usr = await db.get_user(msg.chat.id)
+    lang = langs.get_language(usr['language'])
+    state = bot.current_state(chat=msg.chat.id)
+    await txidStates.txid.set()
+    await state.update_data({'exp': config.PREMIUMS[1000], 'usdt': 1000})
+    await msg.edit_text(f'<b>{lang.t("you_must_paid").format("1000")}</b>\n{lang.t("enter_txid")}')
+
+
+@bot.callback_query_handler(lambda q: q.data == 'sub_1900')
+async def sub_1900(query: types.CallbackQuery):
+    msg = query.message
+    log.info(
+        f'"cmds.startup.sub_1900": Called by {msg.chat.mention} ({str(msg.chat.id)})')
+    usr = await db.get_user(msg.chat.id)
+    lang = langs.get_language(usr['language'])
+    state = bot.current_state(chat=msg.chat.id)
+    await txidStates.txid.set()
+    await state.update_data({'exp': config.PREMIUMS[1900], 'usdt': 1900})
+    await msg.edit_text(f'<b>{lang.t("you_must_paid").format("1900")}</b>\n{lang.t("enter_txid")}')
+
+
+@bot.callback_query_handler(lambda q: q.data == 'sub_4000')
+async def sub_4000(query: types.CallbackQuery):
+    msg = query.message
+    log.info(
+        f'"cmds.startup.sub_4000": Called by {msg.chat.mention} ({str(msg.chat.id)})')
+    usr = await db.get_user(msg.chat.id)
+    lang = langs.get_language(usr['language'])
+    state = bot.current_state(chat=msg.chat.id)
+    await txidStates.txid.set()
+    await state.update_data({'exp': config.PREMIUMS[4000], 'usdt': 4000})
+    await msg.edit_text(f'<b>{lang.t("you_must_paid").format("4000")}</b>\n{lang.t("enter_txid")}')
 
 
 @bot.callback_query_handler(lambda q: q.data == 'main_menu')
@@ -85,10 +175,18 @@ async def start(msg: types.Message, query: bool = False):
             msg_cnt = f'<code>{lang.t("user_recog")}!</code>\n'
     msg_cnt += f'{lang.t("hi")}, {msg.chat.first_name}! {Emojis.hi}'
     key = types.InlineKeyboardMarkup()
-    key.add(types.InlineKeyboardButton(
-        text=f'{Emojis.pen} {lang.t("order")}',
-        callback_data='order'
-    ))
+    binance = (usr["id_binance"] and usr["secret_binance"])
+    if binance:
+        key.add(types.InlineKeyboardButton(
+            text=f'{Emojis.pen} {lang.t("order")}',
+            callback_data='order'
+        ))
+    else:
+        msg_cnt += f'\n\n<b>{lang.t("plz_install_apis")}!</b>'
+        key.add(types.InlineKeyboardButton(
+            text=f'{Emojis.settings} {lang.t("apis")}',
+            callback_data='apis'
+        ))
     key.add(types.InlineKeyboardButton(
         text=f'{Emojis.settings} {lang.t("settings")}',
         callback_data='settings'
@@ -189,15 +287,19 @@ async def fs_buy_sub_txid(msg: types.Message, state: FSMContext):
     log.info(
         f'"cmds.startup.fs_buy_sub_txid": Called by {msg.chat.mention} ({str(msg.chat.id)})')
     await msg.answer_chat_action(types.ChatActions.TYPING)
+    data = await state.get_data()
     await state.finish()
     usr = await db.get_user(uid=msg.chat.id)
     lang = langs.get_language(usr['language'])
-    ev = await msg.answer(f'<code>{lang.t("checking_payment")}...</code>')
+    cnt = f'<b>USDT</b>: <code>{data["usdt"]}</code>\n'
+    cnt += f'<b>TXID</b>: <code>{msg.text}</code>\n'
+    cnt += f'\n<code>{lang.t("checking_payment")}...</code>'
+    ev = await msg.answer(cnt)
     await msg.answer_chat_action(types.ChatActions.TYPING)
-    check = await check_payment(msg.text)
+    check = await check_payment(data['exp'], msg.text)
     key = types.InlineKeyboardMarkup()
     if check:
-        ending = datetime.now() + timedelta(days=config.PREMIUM_DEFAULT_DAYS)
+        ending = datetime.now() + timedelta(days=data['exp'])
         await db.start_premium(uid=msg.chat.id, end=ending)
         await db.set_access(uid=msg.chat.id, access=True)
         cnt = f'{Emojis.ok} <b>{lang.t("thx_for_payment")}!</b>\n'
