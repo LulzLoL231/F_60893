@@ -22,7 +22,7 @@ class txidStates(StatesGroup):
     getState = State()
 
 
-async def check_payment(txid: str) -> bool:
+async def check_payment(exp: int, txid: str) -> bool:
     '''Проверяет оплату премиума по txid.
 
     Args:
@@ -31,7 +31,7 @@ async def check_payment(txid: str) -> bool:
     Returns:
         bool: Boolean.
     '''
-    log.debug(f'"cmds.premium.check_payment": txid: {txid}')
+    log.debug(f'"cmds.premium.check_payment": exp: {str(exp)}; txid: {txid}.')
     # TODO: Make real txid processing.
     if txid == '0':  # FIXME: for development
         return True
@@ -47,47 +47,29 @@ async def query_settings(query: types.CallbackQuery):
     if usr:
         lang = langs.get_language(usr['language'])
         key = types.InlineKeyboardMarkup()
-        key.add(types.InlineKeyboardButton(
-            text=f'{Emojis.back} {lang.t("back_to")} {lang.t("settings").lower()}',
-            callback_data='settings'
-        ))
         premium = await db.get_premium(uid=usr['uid'])
         if premium['premium']:
             cnt = f'{Emojis.on} {lang.t("premium_active")}\n'
             cnt += f'{lang.t("from")}: {premium["premium_start"].ctime()}'
             cnt += f'{lang.t("to")}: {premium["premium_end"].ctime()}'
+            key.add(types.InlineKeyboardButton(
+                text=f'{Emojis.back} {lang.t("back_to")} {lang.t("settings").lower()}',
+                callback_data='settings'
+            ))
             await query.answer()
             await msg.edit_text(cnt)
         else:
-            await txidStates.getState.set()
+            key.add(types.InlineKeyboardButton(
+                text=f'{Emojis.usd}',
+                callback_data='fs_buy_sub'
+            ))
+            key.add(types.InlineKeyboardButton(
+                text=f'{Emojis.back} {lang.t("back_to")} {lang.t("settings").lower()}',
+                callback_data='settings'
+            ))
             await query.answer()
-            await msg.edit_text(f'<b>{lang.t("enter_txid")}</b>')
+            await msg.edit_text(lang.t("pay_sub"))
+            await msg.edit_reply_markup(key)
     else:
         await query.answer()
         await msg.edit_text(f'<code>{langs.get_language(config.DEFAULT_LANG).t("user_404")}</code>')
-
-
-@bot.message_handler(state=txidStates.getState)
-async def check_txid(msg: types.Message, state: FSMContext):
-    await msg.answer_chat_action(types.ChatActions.TYPING)
-    await state.finish()
-    usr = await db.get_user(uid=msg.chat.id)
-    log.info(
-        f'"cmds.premium.check_txid": Called by {msg.chat.mention} ({str(msg.chat.id)})')
-    lang = langs.get_language(usr['language'])
-    ev = await msg.answer(f'TXID: <b>{msg.text}</b>\n<code>{lang.t("checking_payment")}...</code>')
-    key = types.InlineKeyboardMarkup()
-    key.add(types.InlineKeyboardButton(
-        text=f'{Emojis.back} {lang.t("back_to")} {lang.t("settings").lower()}',
-        callback_data='settings'
-    ))
-    status = await check_payment(msg.text)
-    if status:
-        ending = datetime.now() + timedelta(days=config.PREMIUM_DEFAULT_DAYS)
-        await db.start_premium(uid=msg.chat.id, end=ending)
-        cnt = f'{Emojis.ok} {lang.t("thx_for_payment")}!\n'
-        cnt += f'{lang.t("to")}: {ending.ctime()}.'
-        await ev.edit_text(cnt)
-    else:
-        await ev.edit_text(f'{Emojis.warning} {lang.t("payment_err")}!')
-    await ev.edit_reply_markup(key)

@@ -8,7 +8,7 @@ from os import environ
 
 
 BOT_NAME = 'F_60893'
-VERSION = '0.13.0-alpha'
+VERSION = '0.14.0-alpha'
 
 
 class Configuration:
@@ -49,8 +49,14 @@ class Configuration:
         self.DB_BASE_NAME = environ.get('TGBOT_DB_BASE_NAME', self.DB_USERNAME)
         self.DB_SSL = environ.get('TGBOT_DB_SSL', 'prefer')
         self.DB_SSL_ROOTCERT = environ.get('TGBOT_DB_SSL_ROOTCERT', '')
-        self.PREMIUM_DEFAULT_DAYS = 30
         self.DB_USERS_TABLE_NAME = environ.get('TGBOT_DB_USERS_TABLE_NAME', 'bot_users')
+        self.PREMIUMS = {
+            200: 30,
+            540: 90,
+            1000: 180,
+            1900: 360,
+            4000: 36000
+        }
 
     def getToken(self) -> str:
         '''Возвращает Telegram Bot Token основываясь на состоянии self.debug.
