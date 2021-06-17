@@ -13,7 +13,7 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 
 from emojis import Emojis
 from config import config
-from runtime import bot, langs, db
+from runtime import bot, langs, db, bot_user
 from database import DBConnect
 from .premium import check_payment
 
@@ -143,33 +143,39 @@ async def start(msg: types.Message, query: bool = False):
         query (bool): Message from query?
     '''
     log.info(f'"cmds.startup.start": Called by {msg.chat.mention} ({str(msg.chat.id)})')
-    lang = langs.get_language()
-    cnt = f'<code>{lang.t("check_auth")}...</code>'
     if query:
-        ev = await msg.edit_text(cnt)
+        await msg.answer_chat_action(types.ChatActions.TYPING)
     else:
-        ev = await msg.answer(cnt)
+        await msg.answer_chat_action(types.ChatActions.TYPING)
     log.debug('"cmds.startup.start": Checking DB...')
     usr = await db.get_user(uid=msg.chat.id)
+    lang = langs.get_language(usr['language'])
     if usr is None:
         log.debug(f'"cmds.startup.start": User #{str(msg.chat.id)} not found in DB!')
         log.debug(f'"cmds.startup.start": Registration...')
-        await ev.edit_text(f'<code>{lang.t("reg")}...</code>')
         stat = await db.add_user(uid=msg.chat.id)
         if stat:
             log.debug(f'"cmds.startup.start": User #{str(msg.chat.id)} added to DB.')
             usr = await db.get_user(uid=msg.chat.id)
-            await first_startup(ev, usr)
+            if query:
+                await first_startup(msg, usr)
+            else:
+                await first_startup(msg, usr)
             return None
         else:
             log.error(f'"cmds.startup.start" User #{str(msg.chat.id)} registration failed!')
-            await ev.edit_text(f'{Emojis.error} <code>{lang.t("reg_err")}!</code>')
+            if query:
+                await msg.edit_text(f'{Emojis.error} <code>{lang.t("reg_err")}!</code>')
+            else:
+                await msg.edit_text(f'{Emojis.error} <code>{lang.t("reg_err")}!</code>')
     else:
         log.debug(f'"cmds.startup.start": User #{str(msg.chat.id)} found in DB.')
-        lang = langs.get_language(usr['language'])
         if usr['access'] is False:
             log.warning(f'"cmds.startup.start": User #{str(msg.chat.id)} trying get access to profile without subscription!')
-            await first_startup(ev, usr)
+            if query:
+                await first_startup(msg, usr)
+            else:
+                await first_startup(msg, usr)
             return None
         if msg.chat.id == config.ADMIN_ID:
             msg_cnt = f'<code>{lang.t("admin_recog")}!</code>\n'
@@ -214,7 +220,12 @@ async def start(msg: types.Message, query: bool = False):
         text=f'{Emojis.settings} {lang.t("settings")}',
         callback_data='settings'
     ))
-    await ev.edit_text(msg_cnt, reply_markup=key)
+    if query:
+        await msg.edit_text(msg_cnt)
+        await msg.edit_reply_markup(key)
+    else:
+        await msg.edit_text(msg_cnt)
+        await msg.edit_reply_markup(key)
 
 
 async def first_startup(msg: types.Message, usr: Dict[str, Any]):
@@ -263,7 +274,10 @@ async def first_startup(msg: types.Message, usr: Dict[str, Any]):
         username += msg.chat.first_name
         if msg.chat.last_name:
             username += f' {msg.chat.last_name}'
-    await msg.edit_text(lang.t('fs_hi').format(username), reply_markup=key)
+    if msg.from_user != bot_user:
+        await msg.answer(lang.t('fs_hi').format(username), reply_markup=key)
+    else:
+        await msg.edit_text(lang.t('fs_hi').format(username), reply_markup=key)
 
 
 @bot.callback_query_handler(lambda q: q.data == 'fs_chg_lang_eng')
@@ -341,6 +355,7 @@ async def fs_buy_sub_txid(msg: types.Message, state: FSMContext):
 
 @bot.message_handler(commands=['_set_sub_expiration'])
 async def _set_sub_expiration(msg: types.Message):
+    # TODO: Need to delete from Production!
     '''Симулирует что до истечения подписки остаётся меньше 1 дня.
 
     Args:
@@ -360,6 +375,7 @@ async def _set_sub_expiration(msg: types.Message):
 
 @bot.message_handler(commands=['_set_sub_expired'])
 async def _set_sub_expired(msg: types.Message):
+    # TODO: Need to delete from Production!
     '''Симулирует что подписка истекла.
 
     Args:
