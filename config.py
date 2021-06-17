@@ -8,7 +8,7 @@ from os import environ
 
 
 BOT_NAME = 'F_60893'
-VERSION = '0.15.0-alpha'
+VERSION = '0.15.1-alpha'
 
 
 class Configuration:
@@ -57,6 +57,7 @@ class Configuration:
             1900: 360,
             4000: 36000
         }
+        self.PREMIUM_EXP_NOTIFY_SECS = 1440
 
     def getToken(self) -> str:
         '''Возвращает Telegram Bot Token основываясь на состоянии self.debug.
