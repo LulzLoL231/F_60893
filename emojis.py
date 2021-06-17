@@ -22,3 +22,4 @@ class Emojis:
     on = '🟢'
     off = '⚫️'
     key = '🔑'
+    info = 'ℹ️'
