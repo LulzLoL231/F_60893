@@ -48,8 +48,8 @@ async def q_about(query: types.CallbackQuery):
         cnt = f'{Emojis.info} <b>{lang.t("about")}</b>\n\n'
         for data in s_data:
             cnt += f'<b>{lang.t("asset")}:</b> <code>{data["asset"].upper()}</code>\n'
-            cnt += f'<b>{lang.t("balance")}:</b> <code>{data["balance"]} {data["asset"].upper()}</code>\n'
-            cnt += f'<b>{lang.t("withdraw_available")}:</b> <code>{data["withdrawAvailable"]} {data["asset"].upper()}</code>\n\n'
+            cnt += f'<b>{lang.t("balance")}:</b> <code>{round(float(data["balance"]), 1)} {data["asset"].upper()}</code>\n'
+            cnt += f'<b>{lang.t("withdraw_available")}:</b> <code>{round(float(data["withdrawAvailable"]), 1)} {data["asset"].upper()}</code>\n\n'
         cnt = cnt.strip()
     else:
         cnt = f'{Emojis.error} <b>{lang.t("api_404")}!</b>'
