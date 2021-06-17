@@ -59,28 +59,34 @@ async def order(query: types.CallbackQuery):
 {lang.t("stop_market")}: <b>{usr["stop_market_doge"] if bool(usr["stop_market_doge"]) else lang.t("not_used")}{"%" if bool(usr["stop_market_doge"]) else "."}</b>
 '''
     key = types.InlineKeyboardMarkup()
-    key.add(types.InlineKeyboardButton(
-        text=f'{Emojis.pen} "{lang.t("amount")}" USDT',
-        callback_data='change_amount_usdt'
-    ))
-    key.row(types.InlineKeyboardButton(
-        text=f'{Emojis.pen} "{lang.t("take_profit")}" USDT',
-        callback_data='change_take_profit_usdt'
-    ), types.InlineKeyboardButton(
-        text=f'{Emojis.pen} "{lang.t("stop_market")}" USDT',
-        callback_data='change_stop_market_usdt'
-    ))
-    key.add(types.InlineKeyboardButton(
-        text=f'{Emojis.pen} "{lang.t("amount")}" Doge',
-        callback_data='change_amount_doge'
-    ))
-    key.row(types.InlineKeyboardButton(
-        text=f'{Emojis.pen} "{lang.t("take_profit")}" Doge',
-        callback_data='change_take_profit_doge'
-    ), types.InlineKeyboardButton(
-        text=f'{Emojis.pen} "{lang.t("stop_market")}" Doge',
-        callback_data='change_stop_market_doge'
-    ))
+    if usr['premium']:
+        key.add(types.InlineKeyboardButton(
+            text=f'{Emojis.pen} "{lang.t("amount")}" USDT',
+            callback_data='change_amount_usdt'
+        ))
+        key.row(types.InlineKeyboardButton(
+            text=f'{Emojis.pen} "{lang.t("take_profit")}" USDT',
+            callback_data='change_take_profit_usdt'
+        ), types.InlineKeyboardButton(
+            text=f'{Emojis.pen} "{lang.t("stop_market")}" USDT',
+            callback_data='change_stop_market_usdt'
+        ))
+        key.add(types.InlineKeyboardButton(
+            text=f'{Emojis.pen} "{lang.t("amount")}" Doge',
+            callback_data='change_amount_doge'
+        ))
+        key.row(types.InlineKeyboardButton(
+            text=f'{Emojis.pen} "{lang.t("take_profit")}" Doge',
+            callback_data='change_take_profit_doge'
+        ), types.InlineKeyboardButton(
+            text=f'{Emojis.pen} "{lang.t("stop_market")}" Doge',
+            callback_data='change_stop_market_doge'
+        ))
+    else:
+        key.add(types.InlineKeyboardButton(
+            text=f'{Emojis.usd} {lang.t("pay_sub")}',
+            callback_data='fs_buy_sub'
+        ))
     key.add(types.InlineKeyboardButton(
         text=f'{Emojis.back} {lang.t("back_to")} {lang.t("main_menu").lower()}',
         callback_data='main_menu'

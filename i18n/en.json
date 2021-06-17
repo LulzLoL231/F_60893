@@ -93,5 +93,12 @@
     "mon2": "Months",
     "mon3": "Months",
     "forever": "For life",
-    "you_must_paid": "You should have paid {} USDT"
+    "you_must_paid": "You should have paid {} USDT",
+    "dont_forget_renew": "Don't forget to renew your subscription",
+    "sub_off": "Your subscription has expired",
+    "about": "About account",
+    "balance": "Balance",
+    "withdraw_available": "Withdraw available",
+    "asset": "Asset",
+    "api_404": "Stocks API not installed"
 }

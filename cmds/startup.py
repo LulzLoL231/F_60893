@@ -25,6 +25,7 @@ class txidStates(StatesGroup):
 
 
 @bot.callback_query_handler(lambda q: q.data == 'fs_buy_sub')
+@bot.callback_query_handler(lambda q: q.data == 'renew_premium')
 async def fs_buy_sub(query: types.CallbackQuery):
     msg = query.message
     log.info(
@@ -175,11 +176,32 @@ async def start(msg: types.Message, query: bool = False):
             msg_cnt = f'<code>{lang.t("user_recog")}!</code>\n'
     msg_cnt += f'{lang.t("hi")}, {msg.chat.first_name}! {Emojis.hi}'
     key = types.InlineKeyboardMarkup()
+    if usr['premium'] is False:
+        if usr['premium_start']:
+            msg_cnt += f'\n\n<b>{lang.t("sub_off")}!</b>'
+        key.add(
+            types.InlineKeyboardButton(
+                text=f'{Emojis.usd} {lang.t("pay_sub")}',
+                callback_data='fs_buy_sub'
+            )
+        )
+    if usr['premium'] and (usr['premium_end'] - datetime.now()).total_seconds() <= 4320:
+        msg_cnt += f'\n\n<b>{lang.t("dont_forget_renew")}!</b>'
+        key.add(
+            types.InlineKeyboardButton(
+                text=f'{Emojis.renew} {lang.t("renew")} {lang.t("premium").lower()}.',
+                callback_data='renew_premium'
+            )
+        )
     binance = (usr["id_binance"] and usr["secret_binance"])
     if binance:
         key.add(types.InlineKeyboardButton(
             text=f'{Emojis.pen} {lang.t("order")}',
             callback_data='order'
+        ))
+        key.add(types.InlineKeyboardButton(
+            text=f'{Emojis.info} {lang.t("about")}',
+            callback_data='about'
         ))
     else:
         msg_cnt += f'\n\n<b>{lang.t("plz_install_apis")}!</b>'

@@ -66,10 +66,11 @@ async def settings(query: types.CallbackQuery):
             key.add(
                 types.InlineKeyboardButton(
                     text=f'{Emojis.usd} {lang.t("pay_sub")}',
-                    callback_data='buy_premium'
+                    callback_data='fs_buy_sub'
                 )
             )
         if usr['premium'] and (usr['premium_end'] - datetime.now()).total_seconds() <= 4320:
+            cnt += f'\n\n<b>{lang.t("dont_forget_renew")}!</b>'
             key.add(
                 types.InlineKeyboardButton(
                     text=f'{Emojis.renew} {lang.t("renew")} {lang.t("premium").lower()}.',

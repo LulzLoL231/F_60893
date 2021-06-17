@@ -93,5 +93,12 @@
     "mon2": "Del mes",
     "mon3": "Meses",
     "forever": "Por vida",
-    "you_must_paid": "Deberías haber pagado {} USDT"
+    "you_must_paid": "Deberías haber pagado {} USDT",
+    "dont_forget_renew": "No olvide renovar su suscripción",
+    "sub_off": "Su suscripción ha expirado",
+    "about": "Acerca de la cuenta",
+    "balance": "Equilibrio",
+    "withdraw_available": "Disponible para retiro",
+    "asset": "Activo",
+    "api_404": "API de acciones no instalada"
 }
