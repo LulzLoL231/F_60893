@@ -185,7 +185,7 @@ async def start(msg: types.Message, query: bool = False):
                 callback_data='fs_buy_sub'
             )
         )
-    if usr['premium'] and (usr['premium_end'] - datetime.now()).total_seconds() <= 4320:
+    if usr['premium'] and (usr['premium_end'] - datetime.now()).total_seconds() <= config.PREMIUM_EXP_NOTIFY_SECS:
         msg_cnt += f'\n\n<b>{lang.t("dont_forget_renew")}!</b>'
         key.add(
             types.InlineKeyboardButton(
