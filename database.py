@@ -336,7 +336,7 @@ class Database:
         Returns:
             bool: Boolean.
         '''
-        sql = f'UPDATE {config.DB_USERS_TABLE_NAME} SET premium=false, premium_start=null, premium_end=null WHERE uid=$1'
+        sql = f'UPDATE {config.DB_USERS_TABLE_NAME} SET premium=false, premium_end=null WHERE uid=$1'
         res = await conn.execute(sql, uid)
         return bool(res)
 

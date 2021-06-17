@@ -100,5 +100,6 @@
     "balance": "Balance",
     "withdraw_available": "Withdraw available",
     "asset": "Asset",
-    "api_404": "Stocks API not installed"
+    "api_404": "Stocks API not installed",
+    "renew_sub": "Renew subscription"
 }

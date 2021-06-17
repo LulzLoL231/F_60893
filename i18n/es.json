@@ -100,5 +100,6 @@
     "balance": "Equilibrio",
     "withdraw_available": "Disponible para retiro",
     "asset": "Activo",
-    "api_404": "API de acciones no instalada"
+    "api_404": "API de acciones no instalada",
+    "renew_sub": "Renovar la suscripción"
 }

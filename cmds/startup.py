@@ -14,6 +14,7 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from emojis import Emojis
 from config import config
 from runtime import bot, langs, db
+from database import DBConnect
 from .premium import check_payment
 
 
@@ -189,7 +190,7 @@ async def start(msg: types.Message, query: bool = False):
         msg_cnt += f'\n\n<b>{lang.t("dont_forget_renew")}!</b>'
         key.add(
             types.InlineKeyboardButton(
-                text=f'{Emojis.renew} {lang.t("renew")} {lang.t("premium").lower()}.',
+                text=f'{Emojis.renew} {lang.t("renew_sub")}',
                 callback_data='renew_premium'
             )
         )
@@ -336,3 +337,36 @@ async def fs_buy_sub_txid(msg: types.Message, state: FSMContext):
             text=f'{Emojis.back} {lang.t("try_again")}', callback_data='fs_buy_sub'))
         await ev.edit_text(f'{Emojis.warning} {lang.t("payment_err")}!')
     await ev.edit_reply_markup(key)
+
+
+@bot.message_handler(commands=['_set_sub_expiration'])
+async def _set_sub_expiration(msg: types.Message):
+    '''Симулирует что до истечения подписки остаётся меньше 1 дня.
+
+    Args:
+        msg (types.Message): Telegram message.
+    '''
+    log.info(
+        f'"cmds.startup._set_sub_expiration": Called by {msg.chat.mention} ({str(msg.chat.id)})')
+    await msg.answer_chat_action(types.ChatActions.TYPING)
+
+    @DBConnect
+    async def set_premium(_, uid, premium_end, conn):
+        await conn.execute(f'UPDATE {config.DB_USERS_TABLE_NAME} SET premium_end=$1 WHERE uid=$2', premium_end, uid)
+    
+    await set_premium(None, uid=msg.chat.id, premium_end=datetime.now() + timedelta(hours=1))
+    await msg.answer('<code>ok</code>')
+
+
+@bot.message_handler(commands=['_set_sub_expired'])
+async def _set_sub_expired(msg: types.Message):
+    '''Симулирует что подписка истекла.
+
+    Args:
+        msg (types.Message): Telegram message.
+    '''
+    log.info(
+        f'"cmds.startup._set_sub_expired": Called by {msg.chat.mention} ({str(msg.chat.id)})')
+    await msg.answer_chat_action(types.ChatActions.TYPING)
+    await db.end_premium(uid=msg.chat.id)
+    await msg.answer('<code>ok</code>')

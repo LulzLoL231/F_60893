@@ -63,6 +63,8 @@ async def settings(query: types.CallbackQuery):
             cnt += f'{Emojis.espanol} <b>Espanol</b>'
         key = types.InlineKeyboardMarkup()
         if usr['premium'] is False:
+            if usr['premium_start']:
+                cnt += f'\n\n<b>{lang.t("sub_off")}!</b>'
             key.add(
                 types.InlineKeyboardButton(
                     text=f'{Emojis.usd} {lang.t("pay_sub")}',
@@ -73,7 +75,7 @@ async def settings(query: types.CallbackQuery):
             cnt += f'\n\n<b>{lang.t("dont_forget_renew")}!</b>'
             key.add(
                 types.InlineKeyboardButton(
-                    text=f'{Emojis.renew} {lang.t("renew")} {lang.t("premium").lower()}.',
+                    text=f'{Emojis.renew} {lang.t("renew_sub")}',
                     callback_data='renew_premium'
                 )
             )
