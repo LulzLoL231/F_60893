@@ -38,7 +38,7 @@ async def get_about_data(id: str, secret: str) -> Dict[str, Union[str, int]]:
 @bot.callback_query_handler(lambda q: q.data == 'about')
 async def q_about(query: types.CallbackQuery):
     msg = query.message
-    log.info(f'"cmds.about.q.about": Called by {msg.chat.mention} ({str(msg.chat.id)})')
+    log.info(f'"cmds.about.q_about": Called by {msg.chat.mention} ({str(msg.chat.id)})')
     usr = await db.get_user(uid=msg.chat.id)
     lang = langs.get_language(usr['language'])
     key = types.InlineKeyboardMarkup()
