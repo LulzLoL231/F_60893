@@ -167,7 +167,7 @@ async def start(msg: types.Message, query: bool = False):
             if query:
                 await msg.edit_text(f'{Emojis.error} <code>{lang.t("reg_err")}!</code>')
             else:
-                await msg.edit_text(f'{Emojis.error} <code>{lang.t("reg_err")}!</code>')
+                await msg.answer(f'{Emojis.error} <code>{lang.t("reg_err")}!</code>')
     else:
         log.debug(f'"cmds.startup.start": User #{str(msg.chat.id)} found in DB.')
         if usr['access'] is False:
@@ -224,8 +224,7 @@ async def start(msg: types.Message, query: bool = False):
         await msg.edit_text(msg_cnt)
         await msg.edit_reply_markup(key)
     else:
-        await msg.edit_text(msg_cnt)
-        await msg.edit_reply_markup(key)
+        await msg.answer(msg_cnt, reply_markup=key)
 
 
 async def first_startup(msg: types.Message, usr: Dict[str, Any]):
