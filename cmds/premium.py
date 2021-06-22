@@ -26,6 +26,7 @@ async def check_payment(exp: int, txid: str) -> bool:
     '''Проверяет оплату премиума по txid.
 
     Args:
+        exp (int): premium expiration in days.
         txid (str): payment txid.
 
     Returns:
