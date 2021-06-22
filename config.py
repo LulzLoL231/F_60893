@@ -8,7 +8,7 @@ from os import environ
 
 
 BOT_NAME = 'F_60893'
-VERSION = '0.16.2-alpha'
+VERSION = '0.16.3-alpha'
 
 
 class Configuration:
@@ -23,8 +23,8 @@ class Configuration:
         `TGBOT_DEFAULT_LANG` (str) - Стандартный язык для бота. Стандарт: `"ru"`.  
         `DB_HOST` (str) - Хост БД. Стандарт: `"localhost"`.  
         `DB_PORT` (int) - Порт БД. Стандарт: `5432`.  
-        `DB_USERNAME` (str) - Пользователь БД. Стандарт: `"UNKNOWN"`.  
-        `DB_PASSWORD` (str) - Пароль пользователя БД. Стандарт: `"UNKNOWN"`.  
+        `DB_USERNAME` (str) - Пользователь БД. Стандарт: `"postgres"`.  
+        `DB_PASSWORD` (str) - Пароль пользователя БД. Стандарт: `""`.  
         `DB_BASE_NAME` (str) - Имя базы в БД. Стандарт: `"UNKNOWN"`.  
         `DB_SSL` (str) - Режим SSL. Стандарт: `"prefer"`.  
         `DB_SSL_ROOTCERT` (PathLike) - Путь к корневому сертификату БД. Стандарт: `""`.  
@@ -44,8 +44,8 @@ class Configuration:
         self.DEFAULT_LANG = str(environ.get('TGBOT_DEFAULT_LANG', 'ru'))
         self.DB_HOST = environ.get('TGBOT_DB_HOST', 'localhost')
         self.DB_PORT = environ.get('TGBOT_DB_PORT', 5432)
-        self.DB_USERNAME = environ.get('TGBOT_DB_USERNAME', 'UNKNOWN')
-        self.DB_PASSWORD = environ.get('TGBOT_DB_PASSWORD', 'UNKNOWN')
+        self.DB_USERNAME = environ.get('TGBOT_DB_USERNAME', 'postgres')
+        self.DB_PASSWORD = environ.get('TGBOT_DB_PASSWORD', '')
         self.DB_BASE_NAME = environ.get('TGBOT_DB_BASE_NAME', self.DB_USERNAME)
         self.DB_SSL = environ.get('TGBOT_DB_SSL', 'prefer')
         self.DB_SSL_ROOTCERT = environ.get('TGBOT_DB_SSL_ROOTCERT', '')
