@@ -23,3 +23,8 @@ class Emojis:
     off = '⚫️'
     key = '🔑'
     info = 'ℹ️'
+    coolface = '😎'
+    moneyface = '🤑'
+    magic = '🔮'
+    question = '❓'
+    horn = '📣'
