@@ -3,7 +3,6 @@
 #  F_60893 - runtime vars & funcs.
 #  Created by LulzLoL231 at 10/6/21
 #
-from typing import Any, Dict
 from logging import getLogger
 from asyncio import get_event_loop
 
@@ -17,7 +16,7 @@ from database import Database
 
 
 cmds = [
-    BotCommand('start', 'Start')
+    BotCommand('start', 'Запустить бота')
 ]
 
 getLogger(config.NAME).info(f'Telegram Bot {config.NAME} v{config.VERSION}')

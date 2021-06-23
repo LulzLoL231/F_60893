@@ -71,6 +71,13 @@ async def order(query: types.CallbackQuery):
             text=f'{Emojis.pen} "{lang.t("stop_market")}" USDT',
             callback_data='change_stop_market_usdt'
         ))
+        key.row(types.InlineKeyboardButton(
+            text=f'{Emojis.no} "{lang.t("take_profit")}" USDT',
+            callback_data='disable_take_profit_usdt'
+        ), types.InlineKeyboardButton(
+            text=f'{Emojis.no} "{lang.t("stop_market")}" USDT',
+            callback_data='disable_stop_market_usdt'
+        ))
         key.add(types.InlineKeyboardButton(
             text=f'{Emojis.pen} "{lang.t("amount")}" Doge',
             callback_data='change_amount_doge'
@@ -81,6 +88,13 @@ async def order(query: types.CallbackQuery):
         ), types.InlineKeyboardButton(
             text=f'{Emojis.pen} "{lang.t("stop_market")}" Doge',
             callback_data='change_stop_market_doge'
+        ))
+        key.row(types.InlineKeyboardButton(
+            text=f'{Emojis.no} "{lang.t("take_profit")}" Doge',
+            callback_data='disable_take_profit_doge'
+        ), types.InlineKeyboardButton(
+            text=f'{Emojis.no} "{lang.t("stop_market")}" Doge',
+            callback_data='disable_stop_market_doge'
         ))
     else:
         key.add(types.InlineKeyboardButton(
@@ -145,7 +159,7 @@ async def change_take_profit_usdt(msg: types.Message, state: FSMContext):
     if msg.text.isdigit() is False:
         await msg.answer(f'{Emojis.error} <b>{lang.t("incorrect_take_profit")}</b>\nTake profit {lang.t("must_be_digit").lower()}!')
     else:
-        if int(msg.text) <= 100 and int(msg.text) >= 1:
+        if int(msg.text) <= 100 and int(msg.text) >= 0:
             await state.finish()
             await db.set_take_profit_usdt(uid=usr['uid'], take_profit=int(msg.text))
             key = types.InlineKeyboardMarkup()
@@ -155,20 +169,10 @@ async def change_take_profit_usdt(msg: types.Message, state: FSMContext):
             ))
             await msg.answer(f'{Emojis.ok} {lang.t("setted_take_profit")}', reply_markup=key)
         else:
-            if int(msg.text) == 0:
-                await state.finish()
-                key = types.InlineKeyboardMarkup()
-                key.add(types.InlineKeyboardButton(
-                    text=lang.t('confirm'),
-                    callback_data='dont_use_take_profit_usdt'
-                ))
-                await msg.answer(f'{lang.t("dont_use").format("take profit")}?', reply_markup=key)
-
-            else:
-                await msg.answer(f'{Emojis.error} <b>{lang.t("incorrect_take_profit")}</b>\n{lang.t("from_0_to_100").format("take profit")}!')
+            await msg.answer(f'{Emojis.error} <b>{lang.t("incorrect_take_profit")}</b>\n{lang.t("from_0_to_100").format("take profit")}!')
 
 
-@bot.callback_query_handler(lambda q: q.data == 'dont_use_take_profit_usdt')
+@bot.callback_query_handler(lambda q: q.data == 'disable_take_profit_usdt')
 async def dont_use_take_profit_usdt(query: types.CallbackQuery):
     msg = query.message
     usr = await db.get_user(uid=msg.chat.id)
@@ -201,7 +205,7 @@ async def change_stop_market_usdt(msg: types.Message, state: FSMContext):
     if msg.text.isdigit() is False:
         await msg.answer(f'{Emojis.error} <b>{lang.t("incorrect_stop_market")}</b>\nStop market {lang.t("must_be_digit").lower()}!')
     else:
-        if int(msg.text) <= 100 and int(msg.text) >= 1:
+        if int(msg.text) <= 100 and int(msg.text) >= 0:
             await state.finish()
             await db.set_stop_market_usdt(uid=usr['uid'], stop_market=int(msg.text))
             key = types.InlineKeyboardMarkup()
@@ -211,20 +215,10 @@ async def change_stop_market_usdt(msg: types.Message, state: FSMContext):
             ))
             await msg.answer(f'{Emojis.ok} {lang.t("setted_stop_market")}', reply_markup=key)
         else:
-            if int(msg.text) == 0:
-                await state.finish()
-                key = types.InlineKeyboardMarkup()
-                key.add(types.InlineKeyboardButton(
-                    text=lang.t('confirm'),
-                    callback_data='dont_use_stop_market_usdt'
-                ))
-                await msg.answer(f'{lang.t("dont_use").format("stop market")}?', reply_markup=key)
-
-            else:
-                await msg.answer(f'{Emojis.error} <b>{lang.t("incorrect_stop_market")}</b>\n{lang.t("from_0_to_100").format("stop market")}!')
+            await msg.answer(f'{Emojis.error} <b>{lang.t("incorrect_stop_market")}</b>\n{lang.t("from_0_to_100").format("stop market")}!')
 
 
-@bot.callback_query_handler(lambda q: q.data == 'dont_use_stop_market_usdt')
+@bot.callback_query_handler(lambda q: q.data == 'disable_stop_market_usdt')
 async def dont_use_stop_market_usdt(query: types.CallbackQuery):
     msg = query.message
     usr = await db.get_user(uid=msg.chat.id)
@@ -288,7 +282,7 @@ async def change_take_profit_doge(msg: types.Message, state: FSMContext):
     if msg.text.isdigit() is False:
         await msg.answer(f'{Emojis.error} <b>{lang.t("incorrect_take_profit")}</b>\nTake profit {lang.t("must_be_digit").lower()}!')
     else:
-        if int(msg.text) <= 100 and int(msg.text) >= 1:
+        if int(msg.text) <= 100 and int(msg.text) >= 0:
             await state.finish()
             await db.set_take_profit_doge(uid=usr['uid'], take_profit=int(msg.text))
             key = types.InlineKeyboardMarkup()
@@ -298,20 +292,10 @@ async def change_take_profit_doge(msg: types.Message, state: FSMContext):
             ))
             await msg.answer(f'{Emojis.ok} {lang.t("setted_take_profit")}', reply_markup=key)
         else:
-            if int(msg.text) == 0:
-                await state.finish()
-                key = types.InlineKeyboardMarkup()
-                key.add(types.InlineKeyboardButton(
-                    text=lang.t('confirm'),
-                    callback_data='dont_use_take_profit_doge'
-                ))
-                await msg.answer(f'{lang.t("dont_use").format("take profit")}?', reply_markup=key)
-
-            else:
-                await msg.answer(f'{Emojis.error} <b>{lang.t("incorrect_take_profit")}</b>\n{lang.t("from_0_to_100").format("take profit")}!')
+            await msg.answer(f'{Emojis.error} <b>{lang.t("incorrect_take_profit")}</b>\n{lang.t("from_0_to_100").format("take profit")}!')
 
 
-@bot.callback_query_handler(lambda q: q.data == 'dont_use_take_profit_doge')
+@bot.callback_query_handler(lambda q: q.data == 'disable_take_profit_doge')
 async def dont_use_take_profit_doge(query: types.CallbackQuery):
     msg = query.message
     usr = await db.get_user(uid=msg.chat.id)
@@ -344,7 +328,7 @@ async def change_stop_market_doge(msg: types.Message, state: FSMContext):
     if msg.text.isdigit() is False:
         await msg.answer(f'{Emojis.error} <b>{lang.t("incorrect_stop_market")}</b>\nStop market {lang.t("must_be_digit").lower()}!')
     else:
-        if int(msg.text) <= 100 and int(msg.text) >= 1:
+        if int(msg.text) <= 100 and int(msg.text) >= 0:
             await state.finish()
             await db.set_stop_market_doge(uid=usr['uid'], stop_market=int(msg.text))
             key = types.InlineKeyboardMarkup()
@@ -354,20 +338,10 @@ async def change_stop_market_doge(msg: types.Message, state: FSMContext):
             ))
             await msg.answer(f'{Emojis.ok} {lang.t("setted_stop_market")}', reply_markup=key)
         else:
-            if int(msg.text) == 0:
-                await state.finish()
-                key = types.InlineKeyboardMarkup()
-                key.add(types.InlineKeyboardButton(
-                    text=lang.t('confirm'),
-                    callback_data='dont_use_stop_market_doge'
-                ))
-                await msg.answer(f'{lang.t("dont_use").format("stop market")}?', reply_markup=key)
-
-            else:
-                await msg.answer(f'{Emojis.error} <b>{lang.t("incorrect_stop_market")}</b>\n{lang.t("from_0_to_100").format("stop market")}!')
+            await msg.answer(f'{Emojis.error} <b>{lang.t("incorrect_stop_market")}</b>\n{lang.t("from_0_to_100").format("stop market")}!')
 
 
-@bot.callback_query_handler(lambda q: q.data == 'dont_use_stop_market_doge')
+@bot.callback_query_handler(lambda q: q.data == 'disable_stop_market_doge')
 async def dont_use_stop_market_usdt(query: types.CallbackQuery):
     msg = query.message
     usr = await db.get_user(uid=msg.chat.id)
