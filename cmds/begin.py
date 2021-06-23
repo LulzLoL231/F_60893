@@ -29,7 +29,7 @@ async def begin(query: types.CallbackQuery):
     key = types.InlineKeyboardMarkup()
     key.add(types.InlineKeyboardButton(
         text=f'{Emojis.usd} {lang.t("buy_premium")}',
-        callback_data='fs_buy_sub'
+        callback_data='begin_buy'
     ))
     key.add(types.InlineKeyboardButton(
         text=f'{Emojis.question} F.A.Q.',
@@ -49,5 +49,34 @@ async def begin(query: types.CallbackQuery):
         await msg.edit_reply_markup(key)
     else:
         await query.answer()
-        log.info(f'"cmds.faq.faq": User {msg.chat.mention} ({str(msg.chat.id)}) not found in DB.')
+        log.info(
+            f'"cmds.begin.begin": User {msg.chat.mention} ({str(msg.chat.id)}) not found in DB.')
+        await msg.edit_text(lang.t('user_404'))
+
+
+@bot.callback_query_handler(lambda q: q.data == 'begin_buy')
+async def begin_buy(query: types.CallbackQuery):
+    '''Рассказываем о покупке премиума.
+
+    Args:
+        query (types.CallbackQuery): Telegram callback query.
+    '''
+    msg = query.message
+    log.info(
+        f'"cmds.begin.begin_buy": Called by {msg.chat.mention} ({str(msg.chat.id)})')
+    usr = await db.get_user(msg.chat.id)
+    lang = langs.get_language(usr['language'])
+    key = types.InlineKeyboardMarkup()
+    key.add(types.InlineKeyboardButton(
+        text=f'{Emojis.usd} {lang.t("pay_sub")}',
+        callback_data='fs_buy_sub'
+    ))
+    if usr:
+        await query.answer()
+        await msg.edit_text(lang.t('buy_info').format(ok=Emojis.ok))
+        await msg.edit_reply_markup(key)
+    else:
+        await query.answer()
+        log.info(
+            f'"cmds.begin.begin_buy": User {msg.chat.mention} ({str(msg.chat.id)}) not found in DB.')
         await msg.edit_text(lang.t('user_404'))
