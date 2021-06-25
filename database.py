@@ -13,8 +13,16 @@ from asyncpg.connection import Connection
 from config import config
 
 
-DSN = f'postgresql://{config.DB_USERNAME}:{config.DB_PASSWORD}@{config.DB_HOST}:{str(config.DB_PORT)}/'
-DSN += f'{config.DB_BASE_NAME}?sslmode={config.DB_SSL}'
+def makeDSN() -> str:
+    '''Создаёт DSN для подключения к БД.
+    '''
+    dsn = f'postgresql://{config.DB_USERNAME}'
+    if config.DB_PASSWORD:
+        dsn += f':{config.DB_PASSWORD}'
+    dsn += f'@{config.DB_HOST}:{str(config.DB_PORT)}/{config.DB_BASE_NAME}?sslmode={config.DB_SSL}'
+    return dsn
+
+DSN = makeDSN()
 
 
 def DBConnect(func):

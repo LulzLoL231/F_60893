@@ -1,0 +1,33 @@
+version: '3.1'
+
+services:
+  db:
+    container_name: database
+    image: sameersbn/postgresql:10-2
+    restart: always
+    ports:
+      - 5432:5432
+    networks:
+      - botnet
+    volumes:
+      - ./postgres:/var/lib/postgresql
+    command:
+      - echo "listen_addresses='*'" >> ./postgres/9.3/main/postgresql.conf
+  tgbot:
+    container_name: bot
+    build:
+      context: .
+    environment:
+      - TGBOT_TOKEN=730400750:AAHscuzukYZReaeL92ZZRCUkZDd0NelKefI
+    command: python start.py
+    restart: always
+    networks:
+      - botnet
+    volumes:
+      - .:/root/F_60893/.
+    depends_on:
+      - db
+
+networks:
+  botnet:
+    driver: bridge
