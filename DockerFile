@@ -1,0 +1,7 @@
+FROM docker/debian:latest
+RUN apt -y update && apt install -y python3 postgresql git
+RUN cd /root
+RUN git clone https://github.com/LulzLoL231/F_60893
+RUN cd F_60893
+RUN python3 -m pip install -r requirements.txt
+CMD python3 start.py
