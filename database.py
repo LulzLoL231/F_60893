@@ -237,7 +237,12 @@ class Database:
         '''
         res = await conn.fetchrow(f'SELECT * FROM {config.DB_USERS_TABLE_NAME} WHERE uid = $1', uid)
         if res:
-            return dict(res)
+            user = dict(res)
+            if user['premium']:
+                if user['premium_end'] < datetime.now():
+                    self.log.info(f'"database.Database.get_user": Premium expired for user #{str(uid)}!')
+                    await self.end_premium(uid)
+            return user
         return None
 
     @DBConnect
