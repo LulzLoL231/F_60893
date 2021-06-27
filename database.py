@@ -3,8 +3,8 @@
 #  F_60893 - Database.
 #  Created by LulzLoL231 at 11/6/21
 #
-from datetime import datetime
 import logging
+from datetime import datetime
 from typing import Any, Coroutine, Dict, Optional, Union
 
 import asyncpg
@@ -13,21 +13,12 @@ from asyncpg.connection import Connection
 from config import config
 
 
-def makeDSN() -> str:
-    '''Создаёт DSN для подключения к БД.
-    '''
-    dsn = f'postgresql://{config.DB_USERNAME}'
-    if config.DB_PASSWORD:
-        dsn += f':{config.DB_PASSWORD}'
-    dsn += f'@{config.DB_HOST}:{str(config.DB_PORT)}/{config.DB_BASE_NAME}?sslmode={config.DB_SSL}'
-    return dsn
-
-DSN = makeDSN()
-
-
 def DBConnect(func):
     async def wrap(self, *args, **kwargs):
-        conn = await asyncpg.connect()
+        conn = await asyncpg.connect(host=config.DB_HOST, 
+                                     user=config.DB_USERNAME,
+                                     password=config.DB_PASSWORD,
+                                     port=config.DB_PORT)
         res = await func(self, *args, **kwargs, conn=conn)
         await conn.close()
         return res
@@ -39,7 +30,6 @@ class Database:
     '''
     def __init__(self) -> None:
         self.log = logging.getLogger('F_60893')
-        self.log.debug(f'"database.Database.__init__": DSN: "{DSN}"')
 
     @DBConnect
     async def _check_table_exists(self, table: str, conn: Connection) -> bool:

@@ -6,18 +6,25 @@ services:
     image: sameersbn/postgresql:10-2
     restart: always
     ports:
-      - 5432:5432
+      - 24846:5432
     networks:
       - botnet
     volumes:
       - ./postgres:/var/lib/postgresql
-    command:
-      - echo "listen_addresses='*'" >> ./postgres/9.3/main/postgresql.conf
+    environment:
+      - DB_PASS=121776
+      - DB_USER=docker
+      - DB_NAME=docker
   tgbot:
     container_name: bot
     build:
       context: .
     environment:
+      - TGBOT_DB_HOST=134.122.45.167
+      - TGBOT_DB_USERNAME=docker
+      - TGBOT_DB_PASSWORD=121776
+      - TGBOT_DB_PORT=24846
+      - TGBOT_DB_BASE_NAME=docker
       - TGBOT_TOKEN=730400750:AAHscuzukYZReaeL92ZZRCUkZDd0NelKefI
     command: python start.py
     restart: always
