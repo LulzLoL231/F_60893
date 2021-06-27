@@ -27,7 +27,7 @@ DSN = makeDSN()
 
 def DBConnect(func):
     async def wrap(self, *args, **kwargs):
-        conn = await asyncpg.connect(DSN)
+        conn = await asyncpg.connect()
         res = await func(self, *args, **kwargs, conn=conn)
         await conn.close()
         return res
